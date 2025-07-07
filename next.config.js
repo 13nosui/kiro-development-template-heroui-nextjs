@@ -5,6 +5,10 @@ const nextConfig = {
   images: {
     domains: ["firebasestorage.googleapis.com"],
   },
+  // 動的ルートの設定
+  trailingSlash: false,
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

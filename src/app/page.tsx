@@ -1,11 +1,12 @@
-"use client";
-import { redirect } from "next/navigation";
-
-// ホーム（みんなの投稿）
 export default function HomePage() {
-  // ❌ 間違い
-  // redirect("/(auth)/register");
-
-  // ✅ 正しい
-  redirect("/register");
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">AI Development Template</h1>
+        <p className="text-lg text-gray-600">
+          Ready for AI-powered service development
+        </p>
+      </div>
+    </div>
+  );
 }

@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Noto_Sans_JP, Roboto_Mono } from "next/font/google";
-import NextAuthSessionProvider from "@/lib/SessionProvider";
 
 const notoSans = Noto_Sans_JP({
   variable: "--font-geist-sans",
@@ -15,8 +14,8 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nidomi",
-  description: "アートブック共有サービス",
+  title: "AI Development Template",
+  description: "Template for AI-powered service development",
 };
 
 export default function RootLayout({
@@ -29,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} ${robotoMono.variable} antialiased`}
       >
-        <NextAuthSessionProvider>{children}</NextAuthSessionProvider>
+        {children}
       </body>
     </html>
   );
