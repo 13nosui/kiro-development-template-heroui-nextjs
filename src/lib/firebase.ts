@@ -1,8 +1,8 @@
 // src/lib/firebase.ts
 import { initializeApp } from "firebase/app";
-import { getAuth, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, AuthError } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getAuth, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, AuthError, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
+import { getStorage, FirebaseStorage } from "firebase/storage";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 
 const firebaseConfig = {
@@ -14,22 +14,34 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Firebase アプリの初期化（1回だけ）
-const app = initializeApp(firebaseConfig);
+// Firebase設定の検証
+const isValidFirebaseConfig = firebaseConfig.apiKey && 
+  firebaseConfig.authDomain && 
+  firebaseConfig.projectId &&
+  firebaseConfig.apiKey !== 'development-api-key'; // ダミー値を除外
 
-// サービスのインスタンスをエクスポート
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+// Firebase アプリの初期化（設定が有効な場合のみ）
+const app = isValidFirebaseConfig ? initializeApp(firebaseConfig) : null;
+
+// サービスのインスタンスをエクスポート（安全な初期化）
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
+export const storage = app ? getStorage(app) : null;
 
 // Google認証関連
 export async function loginWithFirebase(idToken: string) {
+  if (!auth) {
+    throw new Error('Firebase is not configured properly');
+  }
   const credential = GoogleAuthProvider.credential(idToken);
   await signInWithCredential(auth, credential);
 }
 
 // メールアドレス認証関連
 export async function registerWithEmail(email: string, password: string) {
+  if (!auth) {
+    return { success: false, error: 'Firebase is not configured properly', code: 'auth/not-configured' };
+  }
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     // メール認証を送信
@@ -42,6 +54,9 @@ export async function registerWithEmail(email: string, password: string) {
 }
 
 export async function loginWithEmail(email: string, password: string) {
+  if (!auth) {
+    return { success: false, error: 'Firebase is not configured properly', code: 'auth/not-configured' };
+  }
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { success: true, user: userCredential.user };
@@ -53,5 +68,10 @@ export async function loginWithEmail(email: string, password: string) {
 
 // Firebaseの認証状態を監視するための関数
 export function onAuthStateChanged(callback: (user: User | null) => void) {
+  if (!auth) {
+    // Firebase未設定の場合は即座にnullを返す
+    callback(null);
+    return () => {}; // 空のunsubscribe関数を返す
+  }
   return auth.onAuthStateChanged(callback);
 }

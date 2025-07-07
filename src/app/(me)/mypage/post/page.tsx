@@ -43,7 +43,7 @@ const PostForm = () => {
   };
 
   const handlePost = async () => {
-    if (!croppedImage || !user) {
+    if (!croppedImage || !user || !storage || !db) {
       alert("画像が選択されていないか、ログインしていません。");
       return;
     }

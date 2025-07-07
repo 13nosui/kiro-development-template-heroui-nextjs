@@ -13,8 +13,9 @@ export default function MyPage() {
   useFirebaseAuth(); // ✅ 追加
 
   useEffect(() => {
+    if (!auth) return;
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      if (user && db) {
         const q = query(
           collection(db, "posts"),
           where("userId", "==", user.uid)
