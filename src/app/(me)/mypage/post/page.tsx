@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-
-// 認証が必要なページはSSRを無効化
-export const dynamic = 'force-dynamic';
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { usePostImageStore } from "@/store/postImage";
@@ -19,16 +16,26 @@ import PlusIcon from "@/icons/size40/add.svg";
 import TagDialog from "./TagDialog";
 import ImageCropper from "@/components/ImageCropper";
 
+// 認証が必要なページはSSRとプリレンダリングを無効化
+export const dynamic = 'force-dynamic';
+
 const PostForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [showTagDialog, setShowTagDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const [user] = useAuthState(auth!); // auth が null でないことを想定
+  // SSR時にはauth使用を避け、クライアントサイド専用でuseAuthStateを使用
+  const [user] = useAuthState(auth!);
   const { croppedImage, imageFile, setCroppedImage, setImageFile, clearAll } =
     usePostImageStore();
+
+  // クライアントサイドでのみマウント状態を管理
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // トリミング完了時
   const handleCropComplete = (croppedFile: File) => {
@@ -46,7 +53,7 @@ const PostForm = () => {
   };
 
   const handlePost = async () => {
-    if (!croppedImage || !user || !storage || !db) {
+    if (!mounted || !croppedImage || !user || !storage || !db) {
       alert("画像が選択されていないか、ログインしていません。");
       return;
     }
@@ -91,6 +98,15 @@ const PostForm = () => {
       setIsUploading(false);
     }
   };
+
+  // クライアントサイドでマウントされるまでローディング表示
+  if (!mounted) {
+    return (
+      <div className="min-h-screen w-full max-w-[480px] mx-auto flex items-center justify-center">
+        <div className="text-center">読み込み中...</div>
+      </div>
+    );
+  }
 
   if (imageFile) {
     return (
