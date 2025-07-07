@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Nidomi** is an art book sharing service built with Next.js 14 and Firebase. The application allows users to share and discover art book content through a social platform interface.
+**Project Template** is an art book sharing service built with Next.js 14 and Firebase. The application allows users to share and discover art book content through a social platform interface.
 
 ## Key Technologies
 

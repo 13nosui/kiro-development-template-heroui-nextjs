@@ -5,7 +5,7 @@ allowed-tools: ["Bash", "FileSystem"]
 
 # プロジェクト品質分析
 
-nidomi.ioプロジェクト全体の品質を分析し、最適化提案を生成します。
+Project Templateプロジェクト全体の品質を分析し、最適化提案を生成します。
 
 ## Code Quality Analysis
 ```bash
@@ -192,7 +192,7 @@ cat > project-analysis-report.md << EOF
 # Project Quality Analysis Report - $(date)
 
 ## Overview
-- **Project**: nidomi.io
+- **Project**: Project Template
 - **Analysis Date**: $(date)
 - **Git Commit**: $(git rev-parse HEAD)
 

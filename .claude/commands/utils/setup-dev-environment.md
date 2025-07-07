@@ -5,7 +5,7 @@ allowed-tools: ["Bash", "FileSystem"]
 
 # 開発環境完全セットアップ
 
-新しい環境でnidomi.ioプロジェクトの開発環境を完全構築します。
+新しい環境でProject Templateプロジェクトの開発環境を完全構築します。
 
 ## Prerequisites Check
 ```bash
@@ -46,7 +46,7 @@ echo "✅ Prerequisites check complete"
 # リポジトリクローン（新規の場合）
 if [[ ! -d ".git" ]]; then
   echo "📂 Cloning repository..."
-  git clone https://github.com/sugawaramasaya/nidomi-io.git .
+  git clone https://github.com/sugawaramasaya/project-template.git .
 fi
 
 # 依存関係インストール

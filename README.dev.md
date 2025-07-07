@@ -1,6 +1,6 @@
-# 📘 開発用 README（nidomi.io）
+# 📘 開発用 README（Project Template）
 
-このドキュメントは、`nidomi.io` 開発環境における構成・セットアップ・注意点をまとめたものです。
+このドキュメントは、`Project Template` 開発環境における構成・セットアップ・注意点をまとめたものです。
 
 ---
 

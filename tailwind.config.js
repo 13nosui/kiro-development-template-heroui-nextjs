@@ -8,7 +8,7 @@ module.exports = {
     "./src/icons/**/*.{js,ts,jsx,tsx,svg}",
     "./src/styles/globals.css", // 👈 このように globals.css を追加
   ],
-  safelist: ["text-nidomi-blue-70"], // ✅ 明示的に safelist に追加
+  safelist: ["text-project-template-blue-70"], // ✅ 明示的に safelist に追加
   theme: {
     container: {
       center: true,
@@ -41,7 +41,7 @@ module.exports = {
         // Tailwindデフォルトカラーの拡張（システム系）
         background: "var(--background)",
         foreground: "var(--foreground)",
-        nidomi: {
+        projectTemplate: {
           // セマンティックカラー（役割ベース）
           primary: "var(--primary)",
           "primary-foreground": "var(--on-primary)",

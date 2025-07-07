@@ -1,4 +1,4 @@
-# nidomi.io プロジェクト設定
+# Project Template プロジェクト設定
 
 ## 技術スタック
 - Framework: Next.js 14+ (App Router)
