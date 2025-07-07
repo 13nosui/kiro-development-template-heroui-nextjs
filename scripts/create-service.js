@@ -27,15 +27,20 @@ if (!fs.existsSync(API_DIR)) {
 }
 
 // ページファイル作成
+const capitalizedServiceName = SERVICE_NAME
+  .split('-')
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  .join('');
+
 const pageContent = `import { HeroUIShowcase } from "@/components/HeroUIShowcase";
 import { ServiceDashboard } from "@/components/ServiceDashboard";
 
-export default function ${SERVICE_NAME.charAt(0).toUpperCase() + SERVICE_NAME.slice(1)}Page() {
+export default function ${capitalizedServiceName}Page() {
   return (
     <main className="min-h-screen bg-nidomi-surface">
       <div className="container mx-auto p-6">
         <h1 className="text-large font-bold text-nidomi-primary mb-6">
-          ${SERVICE_NAME.charAt(0).toUpperCase() + SERVICE_NAME.slice(1)} Service
+          ${capitalizedServiceName} Service
         </h1>
         <ServiceDashboard serviceName="${SERVICE_NAME}" />
         <HeroUIShowcase />
@@ -47,7 +52,7 @@ export default function ${SERVICE_NAME.charAt(0).toUpperCase() + SERVICE_NAME.sl
 // API Routeファイル作成
 const apiContent = `import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const data = {
     service: "${SERVICE_NAME}",
     status: "active",

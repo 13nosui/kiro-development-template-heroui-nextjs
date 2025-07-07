@@ -57,7 +57,7 @@ export function ServiceDashboard({ serviceName }: ServiceDashboardProps) {
 
   useEffect(() => {
     fetchServiceData();
-  }, [serviceName]); // fetchServiceData は安定した関数なので依存関係から除外
+  }, []); // 初回のみ実行
 
   return (
     <div className="space-y-6 mb-8">
