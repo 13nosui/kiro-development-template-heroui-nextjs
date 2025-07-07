@@ -1,4 +1,4 @@
-# nidomi.io プロジェクトルール
+# Project Template プロジェクトルール
 
 ## 開発原則
 

@@ -19,7 +19,7 @@ touch .claude/project-rules.md
 
 **`.claude/context.md`**（プロジェクト全体のコンテキスト）
 ```markdown
-# nidomi.io プロジェクト設定
+# Project Template プロジェクト設定
 
 ## 技術スタック
 - Framework: Next.js 14+ (App Router)
@@ -111,8 +111,8 @@ touch .claude/project-rules.md
 ### プロジェクト固有コマンドの追加
 
 ```bash
-# nidomi.io特化コマンド例
-.claude/commands/nidomi/
+# Project Template特化コマンド例
+.claude/commands/project-template/
 ├── create-post-component.md        # 投稿機能コンポーネント
 ├── setup-firebase-rules.md         # Firebase設定
 ├── optimize-image-pipeline.md      # 画像最適化
@@ -166,7 +166,7 @@ Claude Codeのカスタムスラッシュコマンドを活用することで、
 - **保守性・拡張性の確保**
 - **個人スキルアップの加速**
 
-あなたのnidomi.ioプロジェクトでも、これらのコマンドを導入することで、**プロフェッショナルな開発ワークフロー**を即座に構築できます。まずは一つのコマンドから始めて、徐々に拡張していくことをお勧めします！
+あなたのProject Templateプロジェクトでも、これらのコマンドを導入することで、**プロフェッショナルな開発ワークフロー**を即座に構築できます。まずは一つのコマンドから始めて、徐々に拡張していくことをお勧めします！
 
 ## 📚 詳細なコマンド仕様
 

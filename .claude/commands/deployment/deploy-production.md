@@ -184,7 +184,7 @@ fi
 # Deployment Report - $(date)
 
 ## Summary
-- **Project**: nidomi.io
+- **Project**: Project Template
 - **Target**: $ARGUMENTS
 - **Deployment URL**: https://$DEPLOY_URL
 - **Git Commit**: $(git rev-parse HEAD)

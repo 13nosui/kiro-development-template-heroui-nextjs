@@ -1,8 +1,8 @@
-# 📊 nidomi.io Project Analysis
+# 📊 Project Template Analysis
 
 ## 🎯 Project Overview
 
-**nidomi.io** is a Next.js-based web application that serves as an art book sharing service with integrated Figma Dev Mode MCP (Model Context Protocol) server capabilities. The project combines a social media-like platform for sharing visual content with advanced design system integration.
+**Project Template** is a Next.js-based web application that serves as an art book sharing service with integrated Figma Dev Mode MCP (Model Context Protocol) server capabilities. The project combines a social media-like platform for sharing visual content with advanced design system integration.
 
 ## 🏗️ Architecture & Technology Stack
 
@@ -32,7 +32,7 @@
 ## 📁 Project Structure
 
 ```
-nidomi.io/
+project-template/
 ├── src/
 │   ├── app/              # Next.js App Router pages
 │   │   ├── (auth)/       # Authentication pages
@@ -71,8 +71,8 @@ nidomi.io/
 --on-error
 
 /* Brand Colors */
---nidomi-blue-70
---nidomi-blue-50
+--project-template-blue-70
+--project-template-blue-50
 ```
 
 ### Spacing System
@@ -266,4 +266,4 @@ FIGMA_PERSONAL_ACCESS_TOKEN=
 
 ---
 
-This analysis provides a comprehensive overview of the nidomi.io project structure, technologies, and implementation details. The project demonstrates a well-structured approach to building a modern web application with strong design system integration and advanced Figma connectivity.
+This analysis provides a comprehensive overview of the Project Template project structure, technologies, and implementation details. The project demonstrates a well-structured approach to building a modern web application with strong design system integration and advanced Figma connectivity.

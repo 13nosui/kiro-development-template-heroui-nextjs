@@ -1,6 +1,6 @@
 # 🎨 DESIGN_GUIDELINE.md
 
-このドキュメントは、`nidomi.io` のデザイン実装における命名規則とルールのガイドラインです。 主に Tailwind CSS、Figma トークン、Storybook および開発中の共通スタイルに基づいています。
+このドキュメントは、`Project Template` のデザイン実装における命名規則とルールのガイドラインです。 主に Tailwind CSS、Figma トークン、Storybook および開発中の共通スタイルに基づいています。
 
 ---
 
@@ -61,10 +61,10 @@ bg-[var(--surface)]
 border-[var(--outline)]
 ```
 
-- 特別に使用頻度の高いカラー（例：nidomi-blue）は `tailwind.config.js` に拡張し、次のように記述：
+- 特別に使用頻度の高いカラー（例：project-template-blue）は `tailwind.config.js` に拡張し、次のように記述：
 
 ```tsx
-text-nidomi-blue-70
+text-project-template-blue-70
 ```
 
 ### 使用可能カラートークン一覧
@@ -78,8 +78,8 @@ text-nidomi-blue-70
 --on-error
 
 /* プロジェクト専用カラー */
---nidomi-blue-70
---nidomi-blue-50
+--project-template-blue-70
+--project-template-blue-50
 ```
 
 ---
@@ -196,7 +196,7 @@ className="text-[var(--on-surface)] bg-[var(--surface)] px-[var(--space-16)]"
 - カスタムユーティリティ使用時：
 
 ```tsx
-className="text-medium text-nidomi-blue-70"
+className="text-medium text-project-template-blue-70"
 ```
 
 ---
@@ -245,7 +245,7 @@ className="text-medium text-nidomi-blue-70"
 <div className="w-[var(--space-200)] text-[var(--on-surface)] p-[var(--space-16)]">
 
 // ✅ カスタムユーティリティを使用
-<div className="text-medium text-nidomi-blue-70">
+<div className="text-medium text-project-template-blue-70">
 
 // ✅ Figmaデザインに忠実
 <div className="bg-[var(--surface)] border-[var(--outline)]">
@@ -302,4 +302,4 @@ docs/templates/implementation-template.mdの形式で[具体的な内容]を実�
 
 ---
 
-以上が `nidomi.io` におけるデザイン実装の基本方針です。 運用しながら随時アップデートしていきます ✨
+以上が `Project Template` におけるデザイン実装の基本方針です。 運用しながら随時アップデートしていきます ✨
