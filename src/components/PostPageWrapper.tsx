@@ -48,12 +48,12 @@ export default function PostPageWrapper({
     const targets = posts.filter((post) => selectedPostIds.includes(post.id));
     await Promise.all(
       targets.map(async (post) => {
-        await deleteDoc(doc(db, "posts", post.id));
+        await deleteDoc(doc(db!, "posts", post.id));
         await Promise.all(
           post.imageUrls.map(async (url) => {
             const path = new URL(url).pathname.split("/o/")[1].split("?")[0];
             const decodedPath = decodeURIComponent(path);
-            const fileRef = ref(storage, decodedPath);
+            const fileRef = ref(storage!, decodedPath);
             try {
               await deleteObject(fileRef);
             } catch (error) {

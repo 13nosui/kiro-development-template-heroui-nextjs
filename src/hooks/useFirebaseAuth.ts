@@ -9,10 +9,10 @@ export const useFirebaseAuth = () => {
 
   useEffect(() => {
     console.log("📍 useFirebaseAuth - session:", session);
-    console.log("📍 Firebase currentUser:", auth.currentUser);
+    console.log("📍 Firebase currentUser:", auth?.currentUser);
 
     const doLogin = async () => {
-      if (session?.idToken && !auth.currentUser) {
+      if (session?.idToken && auth && !auth.currentUser) {
         try {
           const credential = GoogleAuthProvider.credential(session.idToken);
           await signInWithCredential(auth, credential);

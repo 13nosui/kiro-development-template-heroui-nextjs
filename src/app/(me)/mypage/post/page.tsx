@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+
+// 認証が必要なページはSSRを無効化
+export const dynamic = 'force-dynamic';
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { usePostImageStore } from "@/store/postImage";
@@ -23,7 +26,7 @@ const PostForm = () => {
   const [showTagDialog, setShowTagDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth!); // auth が null でないことを想定
   const { croppedImage, imageFile, setCroppedImage, setImageFile, clearAll } =
     usePostImageStore();
 

@@ -5,6 +5,9 @@ import { auth } from "@/lib/firebase";
 import { sendEmailVerification, reload } from "firebase/auth";
 import Button from "@/components/Button";
 
+// 認証が必要なページはSSRを無効化
+export const dynamic = 'force-dynamic';
+
 export default function VerifyEmailPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +20,7 @@ export default function VerifyEmailPage() {
       router.push("/register/email");
       return;
     }
-    const user = auth.currentUser;
+    const user = auth?.currentUser;
     if (!user) {
       router.push("/register/email");
       return;
@@ -31,7 +34,7 @@ export default function VerifyEmailPage() {
 
     // 認証状態の変更を監視
     const interval = setInterval(async () => {
-      if (auth && auth.currentUser) {
+      if (auth?.currentUser) {
         await reload(auth.currentUser);
         if (auth.currentUser.emailVerified) {
           setIsVerified(true);
@@ -49,7 +52,7 @@ export default function VerifyEmailPage() {
 
   const handleResendEmail = async () => {
     if (!auth) return;
-    const user = auth.currentUser;
+    const user = auth?.currentUser;
     if (!user) return;
 
     setIsLoading(true);
