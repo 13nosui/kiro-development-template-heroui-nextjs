@@ -13,6 +13,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      if (!db) return;
       const snapshot = await getDocs(collection(db, "posts"));
       const fetched = snapshot.docs.map((doc) => ({
         id: doc.id,

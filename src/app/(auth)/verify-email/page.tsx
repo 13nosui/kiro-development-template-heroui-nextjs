@@ -13,6 +13,10 @@ export default function VerifyEmailPage() {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
+    if (!auth) {
+      router.push("/register/email");
+      return;
+    }
     const user = auth.currentUser;
     if (!user) {
       router.push("/register/email");
@@ -27,7 +31,7 @@ export default function VerifyEmailPage() {
 
     // 認証状態の変更を監視
     const interval = setInterval(async () => {
-      if (auth.currentUser) {
+      if (auth && auth.currentUser) {
         await reload(auth.currentUser);
         if (auth.currentUser.emailVerified) {
           setIsVerified(true);
@@ -44,6 +48,7 @@ export default function VerifyEmailPage() {
   }, [router]);
 
   const handleResendEmail = async () => {
+    if (!auth) return;
     const user = auth.currentUser;
     if (!user) return;
 
@@ -94,7 +99,7 @@ export default function VerifyEmailPage() {
                 メール内のリンクをクリックしてアカウントを有効化してください。
               </p>
               <p className="text-sm text-gray-500 mb-8">
-                {auth.currentUser?.email}
+                {auth?.currentUser?.email}
               </p>
             </div>
 

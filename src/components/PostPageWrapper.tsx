@@ -44,6 +44,7 @@ export default function PostPageWrapper({
   };
 
   const handleDelete = useCallback(async () => {
+    if (!db || !storage) return;
     const targets = posts.filter((post) => selectedPostIds.includes(post.id));
     await Promise.all(
       targets.map(async (post) => {
