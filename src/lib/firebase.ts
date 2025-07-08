@@ -26,7 +26,6 @@ export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
 export const storage = app ? getStorage(app) : null;
 
-// Google認証関連
 export async function loginWithFirebase(idToken: string) {
   if (!auth) {
     throw new Error('Firebase is not configured properly');
@@ -35,7 +34,6 @@ export async function loginWithFirebase(idToken: string) {
   await signInWithCredential(auth, credential);
 }
 
-// メールアドレス認証関連
 export async function registerWithEmail(email: string, password: string) {
   if (!auth) {
     return { success: false, error: 'Firebase is not configured properly', code: 'auth/not-configured' };
@@ -67,9 +65,8 @@ export async function loginWithEmail(email: string, password: string) {
 // Firebaseの認証状態を監視するための関数
 export function onAuthStateChanged(callback: (user: User | null) => void) {
   if (!auth) {
-    // Firebase未設定の場合は即座にnullを返す
     callback(null);
-    return () => {}; // 空のunsubscribe関数を返す
+    return () => {};
   }
   return auth.onAuthStateChanged(callback);
 }

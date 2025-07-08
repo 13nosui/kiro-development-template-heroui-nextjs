@@ -10,7 +10,6 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
   
-  // ESLint設定（ビルド時のエラーを回避）
   eslint: {
     ignoreDuringBuilds: true, // ビルド時にESLintエラーを無視
   },
