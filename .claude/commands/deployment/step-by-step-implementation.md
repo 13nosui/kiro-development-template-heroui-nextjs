@@ -1,11 +1,11 @@
 ---
-description: "段階的実装ガイド - Check running対策"
+description: "HeroUIベース段階的実装ガイド - Check running対策"
 allowed-tools: ["FileSystem", "Bash"]
 ---
 
-# 段階的実装ガイド
+# HeroUIベース段階的実装ガイド
 
-$ARGUMENTS を段階的に実装し、Check running で止まらないようにします。
+$ARGUMENTS をHeroUIベースで段階的に実装し、Check running で止まらないようにします。
 
 ## Step 1: タスク分析（必須）
 
@@ -77,60 +77,77 @@ npm run build
 npm run test
 ```
 
-## 実装例: ログイン機能
+## 実装例: HeroUIベースログイン機能
 
 ### Step 1: 基本フォーム
 
 ```tsx
-// 最小限のフォーム構造のみ
+// HeroUIコンポーネントを使用した最小限の構造
+import { Input, Button, Card, CardBody } from "@heroui/react";
+
 export function LoginForm() {
   return (
-    <form>
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Password" />
-      <button type="submit">Login</button>
-    </form>
+    <Card className="max-w-md mx-auto">
+      <CardBody className="space-y-4">
+        <Input type="email" label="Email" />
+        <Input type="password" label="Password" />
+        <Button color="primary" fullWidth>
+          Login
+        </Button>
+      </CardBody>
+    </Card>
   );
 }
 ```
 
-### Step 2: スタイリング追加
+### Step 2: バリデーション追加
 
 ```tsx
-// カスタムトークンを使用したスタイリング
-export function LoginForm() {
-  return (
-    <form className="space-y-[var(--space-16)]">
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full px-[var(--space-16)] py-[var(--space-12)] border border-[var(--border-color)]"
-      />
-      {/* ... */}
-    </form>
-  );
-}
-```
+// HeroUI + React Hook Form連携
+import { Input, Button, Card, CardBody } from "@heroui/react";
+import { useForm } from "react-hook-form";
 
-### Step 3: 状態管理追加
-
-```tsx
-// React Hook Form導入
 export function LoginForm() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = (data) => {
     console.log(data); // まずはログ出力のみ
   };
 
-  // ...
+  return (
+    <Card className="max-w-md mx-auto">
+      <CardBody className="space-y-4">
+        <Input
+          type="email"
+          label="Email"
+          isInvalid={!!errors.email}
+          errorMessage={errors.email?.message}
+          {...register("email", { required: "Email is required" })}
+        />
+        <Input
+          type="password"
+          label="Password"
+          isInvalid={!!errors.password}
+          errorMessage={errors.password?.message}
+          {...register("password", { required: "Password is required" })}
+        />
+        <Button color="primary" fullWidth onPress={handleSubmit(onSubmit)}>
+          Login
+        </Button>
+      </CardBody>
+    </Card>
+  );
 }
 ```
 
-### Step 4: API 連携
+### Step 3: Firebase Auth連携
 
 ```tsx
-// Firebase Auth連携
+// Firebase Auth + HeroUI連携
+import { Button } from "@heroui/react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+
 const onSubmit = async (data) => {
   try {
     await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -138,6 +155,51 @@ const onSubmit = async (data) => {
     console.error(error); // エラーハンドリングは次ステップ
   }
 };
+```
+
+### Step 4: UX改善
+
+```tsx
+// ローディング状態 + エラー表示
+import { Button, Alert } from "@heroui/react";
+
+export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Card className="max-w-md mx-auto">
+      <CardBody className="space-y-4">
+        {error && (
+          <Alert color="danger" title="Error">
+            {error}
+          </Alert>
+        )}
+        {/* ... inputs ... */}
+        <Button 
+          color="primary" 
+          fullWidth 
+          isLoading={isLoading}
+          onPress={handleSubmit(onSubmit)}
+        >
+          Login
+        </Button>
+      </CardBody>
+    </Card>
+  );
+}
 ```
 
 ## トラブルシューティング

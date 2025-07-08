@@ -1,11 +1,11 @@
 ---
-description: "プロジェクト全体の品質分析と最適化提案"
+description: "HeroUIベースプロジェクト全体の品質分析と最適化提案"
 allowed-tools: ["Bash", "FileSystem"]
 ---
 
-# プロジェクト品質分析
+# HeroUIベースプロジェクト品質分析
 
-Project Templateプロジェクト全体の品質を分析し、最適化提案を生成します。
+Project Template HeroUIベースプロジェクト全体の品質を分析し、最適化提案を生成します。
 
 ## Code Quality Analysis
 ```bash
@@ -17,6 +17,10 @@ npx tsc --showConfig
 
 # ESLint結果分析
 npx eslint . --ext .ts,.tsx --format json > eslint-report.json
+
+# HeroUIコンポーネント使用状況確認
+grep -r "from.*@heroui" src/ > heroui-usage-report.txt
+echo "HeroUI components usage saved to heroui-usage-report.txt"
 
 # コード複雑度分析
 npx complexity-report --format json src/ > complexity-report.json
@@ -189,12 +193,22 @@ echo "Comment ratio: $COMMENT_RATIO%"
 echo "📋 Generating Comprehensive Report..."
 
 cat > project-analysis-report.md << EOF
-# Project Quality Analysis Report - $(date)
+# HeroUI Project Quality Analysis Report - $(date)
 
 ## Overview
-- **Project**: Project Template
+- **Project**: Project Template (HeroUI-based)
 - **Analysis Date**: $(date)
 - **Git Commit**: $(git rev-parse HEAD)
+
+## HeroUI Integration Status
+### Component Usage
+$(if [[ -f "heroui-usage-report.txt" ]]; then
+  echo "- HeroUI Components in use: $(wc -l < heroui-usage-report.txt)"
+  echo "- Most used components:"
+  grep -o "@heroui/[^\"']*" heroui-usage-report.txt | sort | uniq -c | sort -nr | head -5
+else
+  echo "- No HeroUI usage analysis available"
+fi)
 
 ## Code Quality Metrics
 ### TypeScript Configuration
@@ -257,15 +271,15 @@ console.log('- Branches:', coverage.branches.pct + '%');
 ## Recommendations
 
 ### High Priority
-1. **Performance Optimization**
+1. **HeroUI Migration Completion**
+   - Replace remaining custom components with HeroUI equivalents
+   - Ensure consistent theme configuration
+   - Optimize HeroUI bundle size
+
+2. **Performance Optimization**
    - Implement code splitting for large components
    - Optimize image loading with Next.js Image component
    - Review and reduce bundle size
-
-2. **Security Improvements**
-   - Update vulnerable dependencies
-   - Implement Content Security Policy
-   - Add rate limiting to API routes
 
 ### Medium Priority
 1. **Code Quality**
@@ -288,6 +302,6 @@ console.log('- Branches:', coverage.branches.pct + '%');
 Recommended: $(date -d '+2 weeks' '+%Y-%m-%d')
 EOF
 
-echo "✅ Comprehensive analysis complete!"
+echo "✅ Comprehensive HeroUI-based analysis complete!"
 echo "📄 Report saved: project-analysis-report.md"
 ```
