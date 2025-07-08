@@ -57,6 +57,31 @@ vite.config.ts
 secrets/
 .secrets/
 
+# Security reports and analysis files
+security-report.json
+env-validation-report.json
+audit-results.json
+vulnerability-report.json
+semgrep-results.json
+*-security-scan.*
+security-*.log
+
+# Temporary security files
+.semgrep/
+.security-tmp/
+.vulnerability-scan/
+
+# License check reports
+license-report.json
+license-check-results.txt
+
+# Additional sensitive patterns
+*.private
+*.confidential
+*_secret.*
+*_private.*
+*.credentials
+
 # IDE and editor files
 .vscode/settings.json
 .idea/
