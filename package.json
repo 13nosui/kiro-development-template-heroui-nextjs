@@ -1,12 +1,24 @@
 {
-  "name": "project-template",
+  "name": "ai-development-template",
   "version": "0.1.0",
   "private": true,
+  "description": "Template for AI-powered service development with HeroUI and Next.js",
+  "keywords": ["next.js", "react", "typescript", "heroui", "tailwindcss", "firebase", "ai", "template"],
+  "author": "Development Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/ai-development-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/ai-development-template/issues"
+  },
+  "homepage": "https://github.com/your-org/ai-development-template#readme",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "tw": "tailwindcss"
