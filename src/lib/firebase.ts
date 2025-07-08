@@ -13,17 +13,36 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+} as const;
 
-// Firebase設定の検証
-const isValidFirebaseConfig = firebaseConfig.apiKey && 
-  firebaseConfig.authDomain && 
-  firebaseConfig.projectId &&
-  firebaseConfig.apiKey !== 'development-api-key' && // ダミー値を除外
-  firebaseConfig.apiKey.length > 20; // 最小限の長さチェック
+// Firebase設定の検証と型安全な設定オブジェクトの作成
+function createValidFirebaseConfig() {
+  if (!firebaseConfig.apiKey || 
+      !firebaseConfig.authDomain || 
+      !firebaseConfig.projectId ||
+      !firebaseConfig.storageBucket ||
+      !firebaseConfig.messagingSenderId ||
+      !firebaseConfig.appId ||
+      firebaseConfig.apiKey === 'development-api-key' ||
+      firebaseConfig.apiKey.length < 20) {
+    return null;
+  }
+  
+  // 型安全な設定オブジェクトを返す
+  return {
+    apiKey: firebaseConfig.apiKey,
+    authDomain: firebaseConfig.authDomain,
+    projectId: firebaseConfig.projectId,
+    storageBucket: firebaseConfig.storageBucket,
+    messagingSenderId: firebaseConfig.messagingSenderId,
+    appId: firebaseConfig.appId,
+  };
+}
+
+const validFirebaseConfig = createValidFirebaseConfig();
 
 // Firebase アプリの初期化（設定が有効な場合のみ）
-const app = isValidFirebaseConfig ? initializeApp(firebaseConfig) : null;
+const app = validFirebaseConfig ? initializeApp(validFirebaseConfig) : null;
 
 // サービスのインスタンスをエクスポート（安全な初期化）
 export const auth = app ? getAuth(app) : null;
@@ -209,8 +228,7 @@ export async function requestPasswordReset(email: string): Promise<AuthResult> {
     return { success: true };
   } catch (error) {
     const authError = error as AuthError;
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const secureError = createSecureErrorResponse(authError, isDevelopment);
+    console.error('Password reset error:', authError);
     
     // セキュリティのため、常に成功を返す（ユーザー存在確認を防ぐ）
     return { success: true };

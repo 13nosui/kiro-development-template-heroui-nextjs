@@ -1,15 +1,16 @@
-# Project Template - HeroUI & Next.js
+# AI Development Template - HeroUI & Next.js
 
-このリポジトリは、**HeroUI** コンポーネントライブラリと **Next.js** を活用したモダンなWebアプリケーション開発テンプレートです。美しく一貫性のあるUIと優れた開発体験を提供します。
+このリポジトリは、**HeroUI** コンポーネントライブラリと **Next.js 15** を活用したAI駆動サービス開発のためのモダンなテンプレートです。美しく一貫性のあるUIと優れた開発体験を提供し、AIアプリケーションの迅速な構築を支援します。
 
 ## ✨ 主な特徴
 
 - 🎨 **HeroUI**: 美しいデザインシステムとアクセシブルなコンポーネント
-- ⚡ **Next.js 14**: App Router による最新のReact開発環境
-- 🎯 **TypeScript**: 型安全な開発体験
+- ⚡ **Next.js 15**: App Router による最新のReact開発環境
+- 🎯 **TypeScript**: 型安全な開発体験で信頼性の高いAIアプリ構築
 - 🎨 **Tailwind CSS**: ユーティリティファーストCSSフレームワーク
 - 📚 **Storybook**: コンポーネント開発・ドキュメント環境
 - 🔥 **Firebase**: 認証・データベース・ストレージの統合バックエンド
+- 🤖 **AI Ready**: AIサービス統合に最適化された構成
 
 ## 🚀 クイックスタート
 
@@ -129,7 +130,7 @@ pnpm storybook
 
 HeroUIコンポーネントの組み合わせやカスタマイズをStorybookで確認・テストできます。
 
-### 型安全性の確保
+### 型安全性とコード品質の確保
 
 ```bash
 # TypeScript型チェック
@@ -137,6 +138,9 @@ pnpm type-check
 
 # ESLint によるコード品質チェック
 pnpm lint
+
+# ビルドテスト（本番環境での動作確認）
+pnpm build
 ```
 
 ## 🎯 開発ガイドライン

@@ -1,6 +1,4 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
-
+// ESLint configuration for AI Development Template
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
@@ -14,8 +12,29 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  ...storybook.configs["flat/recommended"],
-  ...storybook.configs["flat/recommended"]
+  {
+    files: ["*.config.{js,ts}", "*.config.*.{js,ts}"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
+    rules: {
+      // プロジェクト固有のルール設定
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/explicit-function-return-type": "off",
+    },
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "out/**", 
+      "dist/**",
+      "build/**",
+      "storybook-static/**",
+      ".storybook/**",
+      "stories/**",
+    ],
+  }
 ];
 
 export default eslintConfig;
