@@ -24,11 +24,18 @@
     "build-storybook": "storybook build --quiet",
     "tw": "tailwindcss",
     "security:audit": "npm audit --audit-level=moderate",
+    "security:audit:strict": "npm audit --audit-level=high",
     "security:fix": "npm audit fix",
     "security:check": "npm run security:audit && npm outdated",
     "security:update": "npm update && npm run security:audit",
     "security:scan": "node scripts/security-check.js",
-    "env:check": "node -e \"if(!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) console.warn('Warning: NEXT_PUBLIC_FIREBASE_API_KEY not set');\""
+    "security:scan:ci": "npm run security:scan && npm run security:audit:strict",
+    "security:licenses": "npx license-checker --onlyAllow=\"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC\" --summary",
+    "security:secrets": "grep -r -E \"(password|secret|key|token)\\s*[:=]\\s*['\\\"][^'\\\"]{8,}\" src/ --exclude-dir=node_modules || echo 'No hardcoded secrets found'",
+    "security:dependencies": "npm run security:audit:strict && npm run security:licenses",
+    "security:full": "npm run security:scan && npm run security:dependencies && npm run security:secrets",
+    "env:check": "node -e \"if(!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) console.warn('Warning: NEXT_PUBLIC_FIREBASE_API_KEY not set');\"",
+    "env:validate": "node scripts/validate-env.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
