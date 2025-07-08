@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   const accessToken = process.env.FIGMA_ACCESS_TOKEN;
-  const { fileId } = params;
+  const { fileId } = await params;
 
   if (!accessToken) {
     return NextResponse.json(
