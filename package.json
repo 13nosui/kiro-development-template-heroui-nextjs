@@ -42,6 +42,7 @@
     "@storybook/test": "^8.6.14",
     "@storybook/theming": "^8.6.14",
     "@svgr/webpack": "^8.1.0",
+    "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",

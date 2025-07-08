@@ -1,12 +1,37 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+// セキュアなFirebase Storageルール
 service firebase.storage {
   match /b/{bucket}/o {
+    // ユーザー固有のフォルダー: /users/{userId}/*
+    match /users/{userId}/{allPaths=**} {
+      // ユーザーは自分のフォルダーのみアクセス可能
+      allow read, write: if request.auth != null 
+        && request.auth.uid == userId;
+    }
+    
+    // 投稿用画像フォルダー: /posts/{postId}/*
+    match /posts/{postId}/{allPaths=**} {
+      // 読み取り: 認証済みユーザーのみ
+      allow read: if request.auth != null;
+      
+      // 書き込み: 認証済みユーザーのみ（投稿作成者チェックはFirestore側で実装）
+      allow write: if request.auth != null
+        // ファイルサイズ制限（10MB以下）
+        && request.resource.size < 10 * 1024 * 1024
+        // 許可されるファイル形式のみ
+        && request.resource.contentType.matches('image/.*');
+    }
+    
+    // パブリックフォルダー: /public/*（管理者のみ）
+    match /public/{allPaths=**} {
+      allow read: if true; // 誰でも読み取り可能
+      allow write: if false; // 管理者のみ（別途Cloud Functionsで実装）
+    }
+    
+    // その他のパスはすべて拒否
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
