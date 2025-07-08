@@ -1,227 +1,391 @@
 # 🎨 DESIGN_GUIDELINE.md
 
-このドキュメントは、`Project Template` のデザイン実装における命名規則とルールのガイドラインです。 主に Tailwind CSS、Figma トークン、Storybook および開発中の共通スタイルに基づいています。
+このドキュメントは、`Project Template` のデザイン実装における HeroUI ベースの開発ガイドラインです。HeroUI コンポーネントライブラリ、Next.js、Tailwind CSS の最適な組み合わせで美しく一貫性のあるUIを構築します。
 
 ---
 
 ## 🎯 目的
 
-- コンポーネントやスタイルの一貫性を保つ
-- Figma → コード変換時のルール明示
-- リファクタや共同開発を円滑に進める
-- **AI実装時のデザイン精度向上**
+- HeroUI コンポーネントの適切な使用方法の明示
+- Figma → HeroUI 実装時のベストプラクティス
+- 一貫性のあるデザインシステムの維持
+- **AI実装時の HeroUI 活用精度向上**
 
 ---
 
 ## 🚫 AI実装時の絶対禁止事項
 
-### デザイン変更の禁止
-- **Figmaデザインにない要素の追加は絶対禁止**
-- **既存デザインの色、サイズ、余白の変更は事前確認必須**
-- **コンポーネントの見た目を勝手に調整することを禁止**
+### HeroUI使用の原則
+- **独自UIコンポーネントの新規作成は原則禁止**
+- **HeroUIコンポーネントを最大限活用すること**
+- **HeroUIのデザイントークンに従わない独自スタイルは禁止**
 
 ### 実装制限
-- **任意の値（arbitrary values）の使用制限**
-  - ❌ `w-[200px]` `text-[#ff0000]`
-  - ✅ `w-[var(--space-200)]` `text-[var(--error)]`
-- **カスタムCSS追加の禁止**
-  - スタイルは必ずTailwindクラス + 定義済み変数で記述
+- **標準HTMLタグの直接使用を制限**
+  - ❌ `<button>`, `<input>`, `<select>` の直接使用
+  - ✅ `<Button>`, `<Input>`, `<Select>` などのHeroUIコンポーネントを使用
+- **独自CSS追加の制限**
+  - HeroUIテーマシステムで解決できない場合のみ例外的に許可
 
 ---
 
 ## 📋 AI実装時のチェックリスト
 
 ### 実装前の確認事項
-- [ ] 参照するFigmaデザインのリンクとノード番号を確認
-- [ ] 使用するコンポーネントが既存のものか新規作成か確認
-- [ ] 必要な色・サイズ・余白が既存トークンに定義されているか確認
-- [ ] レスポンシブ対応の必要性を確認
+- [ ] 参照するFigmaデザインに対応するHeroUIコンポーネントを確認
+- [ ] 必要なカスタマイズがHeroUIテーマシステムで実現可能か確認
+- [ ] HeroUIのvariant、size、colorプロパティで要件を満たせるか確認
+- [ ] レスポンシブ対応の方針を確認
 
 ### 実装中の確認事項
-- [ ] すべてのカラーが`--color-name`形式で定義されているか
-- [ ] すべてのスペーシングが`--space-*`形式で定義されているか
-- [ ] タイポグラフィが定義済みユーティリティを使用しているか
-- [ ] 任意の値を使用していないか
+- [ ] すべてのUIコンポーネントがHeroUI製かを確認
+- [ ] 色指定がHeroUIのcolor propまたはテーマカラーを使用しているか
+- [ ] サイズ指定がHeroUIのsize propを使用しているか
+- [ ] バリアント指定がHeroUIのvariant propを使用しているか
 
 ### 実装後の確認事項
-- [ ] Figmaデザインと1px単位で一致しているか
+- [ ] Figmaデザインとの視覚的一致を確認
 - [ ] レスポンシブ表示が正しく動作するか
-- [ ] 既存コンポーネントとの整合性が取れているか
+- [ ] アクセシビリティが適切に機能するか（HeroUIのデフォルト機能含む）
 
 ---
 
-## 🎨 カラー
+## 🎨 HeroUI コンポーネント活用ガイド
 
-- カラートークンは `globals.css` の `--color-name` を参照（例：`--on-surface`）
-- Tailwind では次のように使用：
-
-```tsx
-text-[var(--on-surface)]
-bg-[var(--surface)]
-border-[var(--outline)]
-```
-
-- 特別に使用頻度の高いカラー（例：project-template-blue）は `tailwind.config.js` に拡張し、次のように記述：
+### 基本的な使用パターン
 
 ```tsx
-text-project-template-blue-70
+import { 
+  Button, 
+  Input, 
+  Card, 
+  CardBody, 
+  CardHeader,
+  Chip,
+  Avatar
+} from "@heroui/react";
+
+// ✅ 推奨: HeroUIコンポーネントの基本使用
+<Button color="primary" variant="solid" size="md">
+  送信
+</Button>
+
+<Input
+  type="email"
+  label="メールアドレス"
+  placeholder="you@example.com"
+  variant="bordered"
+/>
+
+<Card className="max-w-[400px]">
+  <CardHeader className="flex gap-3">
+    <Avatar src="user.jpg" />
+    <div className="flex flex-col">
+      <p className="text-md">ユーザー名</p>
+      <p className="text-small text-default-500">@username</p>
+    </div>
+  </CardHeader>
+  <CardBody>
+    <p>カードの内容がここに表示されます。</p>
+  </CardBody>
+</Card>
 ```
 
-### 使用可能カラートークン一覧
-```css
-/* 基本カラー */
---surface
---on-surface
---outline
---surface-tint
---error
---on-error
+### カラーシステム
 
-/* プロジェクト専用カラー */
---project-template-blue-70
---project-template-blue-50
+HeroUIの標準カラーパレットを使用：
+
+```tsx
+// プライマリカラー（ブランドカラー）
+<Button color="primary">プライマリ</Button>
+
+// セマンティックカラー
+<Button color="success">成功</Button>
+<Button color="warning">警告</Button>
+<Button color="danger">エラー</Button>
+
+// ニュートラルカラー
+<Button color="default">デフォルト</Button>
+<Button color="secondary">セカンダリ</Button>
+```
+
+### サイズシステム
+
+```tsx
+// 統一されたサイズ指定
+<Button size="sm">小</Button>
+<Button size="md">中（デフォルト）</Button>
+<Button size="lg">大</Button>
+
+<Input size="sm" />
+<Input size="md" />
+<Input size="lg" />
+```
+
+### バリアントシステム
+
+```tsx
+// ボタンバリアント
+<Button variant="solid">ソリッド</Button>
+<Button variant="bordered">ボーダー</Button>
+<Button variant="light">ライト</Button>
+<Button variant="flat">フラット</Button>
+<Button variant="faded">フェード</Button>
+<Button variant="shadow">シャドウ</Button>
+<Button variant="ghost">ゴースト</Button>
+
+// インプットバリアント
+<Input variant="flat" />
+<Input variant="bordered" />
+<Input variant="faded" />
+<Input variant="underlined" />
 ```
 
 ---
 
-## 📏 スペーシング / レイアウト
+## � テーマカスタマイズ
 
-- スペーシングはすべて `globals.css` にある `--space-*` トークンを使用
-- クラス例：
+### HeroUIProvider設定
+
+`src/app/providers.tsx` での基本設定：
 
 ```tsx
-gap-[var(--space-16)]
-px-[var(--space-24)]
-py-[var(--space-12)]
-```
+import { HeroUIProvider } from "@heroui/react";
 
-### 使用可能スペーシングトークン一覧
-```css
---space-4    /* 4px */
---space-8    /* 8px */
---space-12   /* 12px */
---space-16   /* 16px */
---space-24   /* 24px */
---space-32   /* 32px */
---space-48   /* 48px */
---space-64   /* 64px */
-```
-
-- ブレークポイントは `tailwind.config.js` の `screens` に合わせて `xs`（480px）をベースに構成
-
----
-
-## 🅰️ タイポグラフィ
-
-- タイポグラフィトークンは `globals.css` に定義された以下の変数を使用：
-
-```css
---font-size-large
---line-height-large
---font-size-medium
---line-height-medium
---font-size-small
---line-height-small
-```
-
-- これらを活かしたカスタムユーティリティを `@layer utilities` で定義（例）：
-
-```css
-@layer utilities {
-  .text-large {
-    font-size: var(--font-size-large);
-    line-height: var(--line-height-large);
-  }
-  .text-medium {
-    font-size: var(--font-size-medium);
-    line-height: var(--line-height-medium);
-  }
-  .text-small {
-    font-size: var(--font-size-small);
-    line-height: var(--line-height-small);
-  }
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <HeroUIProvider>
+      {children}
+    </HeroUIProvider>
+  );
 }
 ```
 
-### 使用例
-```tsx
-// ✅ 正しい使用例
-<h1 className="text-large text-[var(--on-surface)]">見出し</h1>
+### Tailwind CSS設定
 
-// ❌ 間違った使用例
-<h1 className="text-2xl text-black">見出し</h1>
+`tailwind.config.js` での HeroUI 統合：
+
+```js
+const { heroui } = require("@heroui/react");
+
+module.exports = {
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  darkMode: "class",
+  plugins: [heroui()],
+};
+```
+
+### カスタムテーマの適用
+
+```tsx
+import { HeroUIProvider } from "@heroui/react";
+
+const customTheme = {
+  extend: "dark", // base theme
+  colors: {
+    primary: {
+      50: "#eff6ff",
+      500: "#3b82f6",
+      900: "#1e3a8a",
+      DEFAULT: "#3b82f6",
+    },
+  },
+};
+
+<HeroUIProvider theme={customTheme}>
+  {children}
+</HeroUIProvider>
 ```
 
 ---
 
-## 🔧 実装手順
+## 🧩 コンポーネント使い分けガイド
 
-### 1. 実装前準備
-1. Figmaデザインの詳細を確認
-2. 必要なトークンが定義されているか確認
-3. 使用するコンポーネントを特定
+### フォーム関連
 
-### 2. マークアップ実装
-1. 構造のみを先に実装（スタイリングなし）
-2. 既存コンポーネントの活用を優先
-3. 新規コンポーネントは最小限に
+| 用途 | HeroUIコンポーネント | 使用例 |
+|------|---------------------|--------|
+| テキスト入力 | `Input` | ユーザー名、メール |
+| パスワード入力 | `Input type="password"` | ログインフォーム |
+| 長文入力 | `Textarea` | コメント、説明文 |
+| 選択肢 | `Select` | 国選択、カテゴリ選択 |
+| 複数選択 | `CheckboxGroup` | 興味・関心選択 |
+| 単一選択 | `RadioGroup` | 性別、プラン選択 |
+| オン/オフ切替 | `Switch` | 通知設定、プライバシー |
 
-### 3. スタイリング実装
-1. 定義済みトークンのみを使用
-2. レスポンシブ対応を考慮
-3. 任意の値は使用禁止
+### ナビゲーション関連
 
-### 4. 動作確認
-1. Figmaデザインとの照合
-2. 複数画面サイズでの表示確認
-3. 既存コンポーネントとの整合性確認
+| 用途 | HeroUIコンポーネント | 使用例 |
+|------|---------------------|--------|
+| メインボタン | `Button` | 送信、保存、削除 |
+| アイコンボタン | `Button isIconOnly` | いいね、共有、メニュー |
+| リンクボタン | `Button as={Link}` | ページ遷移 |
+| ナビゲーション | `Navbar` | ヘッダーナビ |
+| タブ切替 | `Tabs` | 設定画面、ダッシュボード |
+| パンくずリスト | `Breadcrumbs` | ページ階層表示 |
+
+### データ表示関連
+
+| 用途 | HeroUIコンポーネント | 使用例 |
+|------|---------------------|--------|
+| カード表示 | `Card` | 投稿、プロフィール |
+| リスト表示 | `Listbox` | メニュー、選択肢 |
+| テーブル | `Table` | データ一覧 |
+| ユーザー情報 | `User` | プロフィール表示 |
+| アバター | `Avatar` | ユーザー画像 |
+| タグ・ラベル | `Chip` | カテゴリ、ステータス |
+
+### フィードバック関連
+
+| 用途 | HeroUIコンポーネント | 使用例 |
+|------|---------------------|--------|
+| 読み込み表示 | `Spinner`, `CircularProgress` | データ取得中 |
+| 通知・アラート | `Alert` (カスタム実装推奨) | エラー、成功メッセージ |
+| モーダル | `Modal` | 確認ダイアログ、詳細表示 |
+| ツールチップ | `Tooltip` | 補助説明 |
+| ポップオーバー | `Popover` | 追加情報表示 |
 
 ---
 
-## 🧩 命名規則
+## 📱 レスポンシブデザイン対応
 
-### コンポーネント / ディレクトリ
-
-- コンポーネント：`PascalCase`（例：`PostCard.tsx`, `UserProfile.tsx`）
-- フックや関数系：`camelCase`（例：`useUploadImage.ts`, `formatDate.ts`）
-
-### className
-
-- Tailwind ユーティリティ + カスタム変数で構成：
+### HeroUI + Tailwind CSSの組み合わせ
 
 ```tsx
-className="text-[var(--on-surface)] bg-[var(--surface)] px-[var(--space-16)]"
+// レスポンシブなボタンサイズ
+<Button 
+  size="sm" 
+  className="md:size-md lg:size-lg"
+>
+  レスポンシブボタン
+</Button>
+
+// レスポンシブなカードレイアウト
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <Card className="max-w-full">
+    {/* カード内容 */}
+  </Card>
+</div>
+
+// レスポンシブなナビゲーション
+<Navbar 
+  isBordered
+  className="md:px-6"
+  classNames={{
+    wrapper: "max-w-full md:max-w-7xl"
+  }}
+>
+  {/* ナビゲーション内容 */}
+</Navbar>
 ```
 
-- カスタムユーティリティ使用時：
+### ブレークポイント設定
 
+Tailwind CSSの標準ブレークポイントを使用：
+
+```css
+/* モバイルファースト */
+.responsive-component {
+  /* デフォルト（モバイル） */
+  @apply text-sm;
+  
+  /* タブレット以上 */
+  @apply md:text-base;
+  
+  /* デスクトップ以上 */
+  @apply lg:text-lg;
+}
+```
+
+---
+
+## 🎨 デザインパターン
+
+### 一般的なレイアウトパターン
+
+#### 1. カード型レイアウト
 ```tsx
-className="text-medium text-project-template-blue-70"
+<Card className="max-w-[400px]">
+  <CardHeader>
+    <h4 className="text-large font-bold">タイトル</h4>
+  </CardHeader>
+  <CardBody className="px-3 py-0 text-small text-default-400">
+    <p>説明文がここに入ります。</p>
+  </CardBody>
+  <CardFooter className="gap-3">
+    <Button color="primary" variant="flat" size="sm">
+      アクション1
+    </Button>
+    <Button color="primary" size="sm">
+      アクション2
+    </Button>
+  </CardFooter>
+</Card>
 ```
 
----
+#### 2. フォームレイアウト
+```tsx
+<div className="flex flex-col gap-4 max-w-md">
+  <Input
+    type="email"
+    label="メールアドレス"
+    placeholder="you@example.com"
+    variant="bordered"
+  />
+  <Input
+    type="password"
+    label="パスワード"
+    placeholder="パスワードを入力"
+    variant="bordered"
+  />
+  <div className="flex gap-2 justify-end">
+    <Button color="danger" variant="flat">
+      キャンセル
+    </Button>
+    <Button color="primary">
+      ログイン
+    </Button>
+  </div>
+</div>
+```
 
-## 🧩 トークンとコンポーネント対応
+#### 3. ナビゲーションレイアウト
+```tsx
+<Navbar isBordered>
+  <NavbarContent>
+    <NavbarBrand>
+      <p className="font-bold text-inherit">PROJECT</p>
+    </NavbarBrand>
+  </NavbarContent>
 
-| トークン         | 使用箇所           | 対応コンポーネント例               |
-| ---------------- | ------------------ | ---------------------------------- |
-| `--space-16`     | padding 左右       | Button, TextField, TagDeleteButton |
-| `--radius-full`  | 角丸               | Button, IconButton, FAB            |
-| `--on-surface`   | テキスト色         | TextField, Button, FollowButton    |
-| `--outline`      | フォーカスボーダー | TextField, Switch                  |
-| `--surface-tint` | 背景               | FAB, IconButton (fab variant)      |
+  <NavbarContent className="hidden sm:flex gap-4" justify="center">
+    <NavbarItem>
+      <Link color="foreground" href="/home">
+        ホーム
+      </Link>
+    </NavbarItem>
+    <NavbarItem>
+      <Link color="foreground" href="/about">
+        概要
+      </Link>
+    </NavbarItem>
+  </NavbarContent>
 
----
-
-## 📱 画面構成方針（抜粋）
-
-| パス                  | 目的                 | 主なコンポーネント                         |
-| --------------------- | -------------------- | ------------------------------------------ |
-| `/mypage/post`        | 投稿作成画面         | TextField, Button, TagDeleteButton         |
-| `/mypage`             | 自分の投稿一覧・削除 | CountIconButton, IconButton, Checkbox      |
-| `/home`               | 全ユーザーの投稿一覧 | CountIconButton, CollectionCountIconButton |
-| `/settings`           | ユーザー設定画面     | Switch, TextField, Button                  |
-| `/login`, `/register` | 認証画面             | TextField, Button                          |
+  <NavbarContent justify="end">
+    <NavbarItem>
+      <Button as={Link} color="primary" href="/login" variant="flat">
+        ログイン
+      </Button>
+    </NavbarItem>
+  </NavbarContent>
+</Navbar>
+```
 
 ---
 
@@ -229,77 +393,121 @@ className="text-medium text-project-template-blue-70"
 
 ### 間違った実装例
 ```tsx
-// ❌ 任意の値を使用
-<div className="w-[200px] text-[#333333] p-[10px]">
+// ❌ 標準HTMLタグの直接使用
+<button className="bg-blue-500 text-white px-4 py-2 rounded">
+  ボタン
+</button>
 
-// ❌ 標準のTailwindクラスを使用
-<div className="text-gray-800 p-4">
+// ❌ 独自コンポーネントの作成
+const CustomButton = ({ children }) => (
+  <div className="custom-button-styles">
+    {children}
+  </div>
+);
 
-// ❌ デザインにない要素を追加
-<div className="shadow-lg border-2">
+// ❌ HeroUIの機能を無視したスタイリング
+<Button className="!bg-red-500 !text-white">
+  色を強制上書き
+</Button>
 ```
 
 ### 正しい実装例
 ```tsx
-// ✅ 定義済みトークンを使用
-<div className="w-[var(--space-200)] text-[var(--on-surface)] p-[var(--space-16)]">
+// ✅ HeroUIコンポーネントの適切な使用
+<Button color="primary" variant="solid">
+  ボタン
+</Button>
 
-// ✅ カスタムユーティリティを使用
-<div className="text-medium text-project-template-blue-70">
+// ✅ HeroUIのpropsを活用
+<Button 
+  color="danger"
+  variant="bordered"
+  size="lg"
+  startContent={<DeleteIcon />}
+>
+  削除
+</Button>
 
-// ✅ Figmaデザインに忠実
-<div className="bg-[var(--surface)] border-[var(--outline)]">
+// ✅ 必要に応じたカスタマイズ
+<Button 
+  color="primary"
+  className="font-bold"
+  classNames={{
+    base: "bg-gradient-to-r from-blue-500 to-purple-500"
+  }}
+>
+  グラデーションボタン
+</Button>
 ```
 
 ---
 
-## 🚨 エラー時の対応
+## � パフォーマンス最適化
 
-### AIが間違いを犯した場合
-1. **すぐに実装を停止**
-2. **間違いの具体的な指摘**
-3. **正しい実装例を提示**
-4. **再実装を依頼**
+### Tree Shaking対応
+```tsx
+// ✅ 必要なコンポーネントのみインポート
+import { Button, Input, Card } from "@heroui/react";
 
-### 不明な点がある場合
-1. **実装前に必ず確認**
-2. **推測での実装は禁止**
-3. **デザイナーに確認を依頼**
+// ❌ 全体インポートは避ける
+import * as HeroUI from "@heroui/react";
+```
 
----
-
-## ✅ 今後の方針
-
-- 本ガイドラインは MVP フェーズ用に簡易版として運用
-- 開発が安定したら Figma のスタイル名と連携した命名設計を本格導入予定
-- **AI実装時の精度向上を継続的に改善**
+### 動的インポート
+```tsx
+// 大きなコンポーネントは動的インポート
+const DataTable = dynamic(() => import("@heroui/react").then(mod => mod.Table), {
+  loading: () => <Spinner />,
+});
+```
 
 ---
 
 ## 🤖 AI実装時の追加ルール
 
 ### 基本方針
-- **全ての実装・リファクタリング時は `docs/AI_IMPLEMENTATION_RULES.md` に従うこと**
-- **リファクタリング時は `docs/REFACTORING_GUIDE.md` の段階的手順に従うこと**
-- **実装指示は `docs/templates/` のテンプレートを活用すること**
+- **HeroUIコンポーネントファーストの開発**
+- **Figmaデザインをそのままコードに落とし込む際も、可能な限りHeroUIで実現**
+- **カスタマイズが必要な場合は、HeroUIのテーマシステムを優先活用**
 
-### 簡潔な指示パターン
+### AI指示の効果的なパターン
 ```bash
-# 新規実装時
-docs/AI_IMPLEMENTATION_RULES.mdに従って、[具体的な内容]を実装してください。
+# 新規UI実装時
+HeroUIコンポーネントを使用して、[具体的な内容]を実装してください。
+可能な限りvariant、size、colorプロパティで要件を満たしてください。
 
-# リファクタリング時  
-docs/REFACTORING_GUIDE.mdに従って、[具体的な内容]をリファクタリングしてください。
+# 既存UI更新時  
+既存の独自コンポーネントを、対応するHeroUIコンポーネントに置き換えてください。
+デザインの一貫性を保ちながら、HeroUIの機能を最大限活用してください。
 
-# テンプレート使用時
-docs/templates/implementation-template.mdの形式で[具体的な内容]を実行してください。
+# カスタマイズが必要な場合
+HeroUIのテーマシステムまたはclassNamesプロパティを使用して、
+[具体的な要件]を実現してください。独自CSSの追加は最小限に留めてください。
 ```
-
-### 効果測定指標
-- AIが間違いを犯す頻度の減少
-- 実装→確認→修正のサイクル時間短縮  
-- Figmaデザインとの一致精度向上
 
 ---
 
-以上が `Project Template` におけるデザイン実装の基本方針です。 運用しながら随時アップデートしていきます ✨
+## 📚 参考リソース
+
+### 公式ドキュメント
+- [HeroUI Documentation](https://www.heroui.com/)
+- [HeroUI Components](https://www.heroui.com/docs/components)
+- [HeroUI Theming](https://www.heroui.com/docs/customization/theme)
+
+### 実装例とテンプレート
+- [HeroUI Templates](https://www.heroui.com/templates)
+- [HeroUI Examples](https://www.heroui.com/examples)
+
+---
+
+## ✅ 今後の方針
+
+- **HeroUIベースの継続的改善**: 新機能リリースに合わせてコンポーネント選択を最適化
+- **デザインシステムの拡張**: プロジェクト固有の要件に合わせたテーマカスタマイズ
+- **パフォーマンス監視**: Bundle sizeとレンダリング性能の継続的な監視
+- **アクセシビリティの向上**: HeroUIの標準機能を活用したアクセシブルなUI構築
+
+---
+
+以上が `Project Template` における HeroUI ベースのデザイン実装ガイドラインです。
+美しく一貫性があり、アクセシブルなUIを効率的に構築するために継続的に改善していきます ✨
