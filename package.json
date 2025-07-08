@@ -21,7 +21,7 @@
     "lint:check": "eslint \"src/**/*.{ts,tsx,js,jsx}\" \"*.{ts,tsx,js,jsx}\"",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "build-storybook": "storybook build --quiet",
     "tw": "tailwindcss"
   },
   "dependencies": {
