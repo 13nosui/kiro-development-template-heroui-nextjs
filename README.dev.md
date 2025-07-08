@@ -1,14 +1,15 @@
 # 📘 開発用 README（Project Template）
 
-このドキュメントは、`Project Template` 開発環境における構成・セットアップ・注意点をまとめたものです。
+このドキュメントは、`Project Template` 開発環境における HeroUI + Next.js 構成・セットアップ・注意点をまとめたものです。
 
 ---
 
 ## 🔧 開発環境
 
 - **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Styling**: Tailwind CSS
-- **Component Dev**: Storybook v8.6.14 (webpack5 使用)
+- **UI Library**: [HeroUI](https://www.heroui.com/) - モダンなReact UIコンポーネントライブラリ
+- **Styling**: HeroUI + Tailwind CSS
+- **Component Dev**: Storybook v8.6.14 (webpack5 使用) - HeroUIコンポーネントのカスタマイズ・テスト
 - **Icons/SVG**: @svgr/webpack による SVG 読み込み対応済み
 - **Hosting**: Vercel
 - **Backend**: Firebase（Auth / Firestore / Storage）
@@ -45,14 +46,71 @@ pnpm install
 
 ## 📁 ディレクトリ構成（抜粋）
 
+```
 src/
-├── app/ # App Router ベースの画面構成
-├── components/ # 再利用コンポーネント
-├── lib/firebase.ts # Firebase 初期化設定
-├── stories/ # Storybook 専用の.stories ファイル
+├── app/                 # App Router ベースの画面構成
+│   ├── layout.tsx      # ルートレイアウト（HeroUIProvider設定）
+│   ├── page.tsx        # ホームページ
+│   └── providers.tsx   # HeroUIプロバイダー設定
+├── components/         # 再利用コンポーネント（HeroUIベース）
+├── lib/               # ユーティリティ・設定
+│   └── firebase.ts    # Firebase 初期化設定
+├── stories/           # Storybook 専用の.stories ファイル
+└── types/             # TypeScript型定義
+
 .storybook/
-├── main.ts # Storybook の設定（webpack5 ベース）
-├── preview\.tsx # Storybook 共通スタイル
+├── main.ts            # Storybook の設定（webpack5 ベース）
+└── preview.tsx        # Storybook 共通スタイル（HeroUIテーマ設定）
+```
+
+---
+
+## 🎨 HeroUI 設定
+
+### パッケージ構成
+
+```json
+{
+  "@heroui/react": "^2.7.11",
+  "@heroui/theme": "^2.4.17"
+}
+```
+
+### Tailwind CSS 統合設定
+
+`tailwind.config.js` にてHeroUIプラグインを統合：
+
+```js
+const { heroui } = require("@heroui/react");
+
+module.exports = {
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  darkMode: "class",
+  plugins: [heroui()],
+};
+```
+
+### Provider設定
+
+`src/app/providers.tsx` にてHeroUIプロバイダーを設定：
+
+```tsx
+import { HeroUIProvider } from "@heroui/react";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <HeroUIProvider>
+      {children}
+    </HeroUIProvider>
+  );
+}
+```
 
 ---
 
@@ -60,15 +118,59 @@ src/
 
 ### ✅ 使用バージョン
 
-"@storybook/react": "8.6.14",
-"@storybook/nextjs": "8.6.14",
-"@storybook/addon-essentials": "8.6.14",
-"@storybook/addon-docs": "8.6.14",
-"@storybook/addon-a11y": "8.6.14"
+```json
+{
+  "@storybook/react": "8.6.14",
+  "@storybook/nextjs": "8.6.14",
+  "@storybook/addon-essentials": "8.6.14",
+  "@storybook/addon-docs": "8.6.14",
+  "@storybook/addon-a11y": "8.6.14"
+}
+```
+
+### ✅ HeroUI対応設定
+
+- `webpack5` ビルダーを使用（Vite 非対応）
+- HeroUIコンポーネントのテーマ・カスタマイズをStorybookで確認可能
+- `.storybook/preview.tsx` にてHeroUIProvider設定済み
+
+### HeroUIコンポーネントのStorybook開発
+
+```tsx
+// Button.stories.tsx 例
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from '@heroui/react';
+
+const meta: Meta<typeof Button> = {
+  title: 'HeroUI/Button',
+  component: Button,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Primary: Story = {
+  args: {
+    color: 'primary',
+    children: 'Button',
+  },
+};
+
+export const Secondary: Story = {
+  args: {
+    color: 'secondary',
+    variant: 'bordered',
+    children: 'Button',
+  },
+};
+```
 
 ### ✅ 注意点
 
-- `webpack5` ビルダーを使用（Vite 非対応）
 - `vite`, `vitest` 関連パッケージは削除済み（誤導入注意）
 - `.storybook/assets/`, `src/stories/assets/` など **デモファイルは削除済み**
 - `.storybook/` 配下を参照していた `storybook-stories.js` エラー対策として、`main.ts` の `webpackFinal` にて `.storybook/` を除外設定済み
@@ -84,12 +186,19 @@ config.entry = config.entry?.filter?.((entry: string) => {
 
 ## 🖼 SVG の扱い方
 
-`.svg` ファイルは React コンポーネントとして読み込み可能：
+HeroUIのアイコンシステムと併用してSVGを活用：
 
 ```tsx
-import Icon from "@/assets/icon.svg";
+// HeroUIのアイコンプロパティとして使用
+import { Button } from "@heroui/react";
+import CustomIcon from "@/assets/custom-icon.svg";
 
-<Icon className="w-6 h-6 text-gray-500" />;
+<Button
+  startContent={<CustomIcon className="w-4 h-4" />}
+  color="primary"
+>
+  カスタムアイコン付きボタン
+</Button>
 ```
 
 `.storybook/main.ts` にて `@svgr/webpack` ローダーを適用済み。
@@ -119,6 +228,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 - 自動デプロイ対応済み（main ブランチ）
 - `vercel logs` や `Clear cache & redeploy` を使ってデバッグ可能
 - Firebase 環境変数も Vercel 側に登録済み
+- HeroUIのCSS最適化により高速なページロード
 
 ---
 
@@ -126,29 +236,51 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 
 - `Vitest` 系は導入せず、**必要な場合は `Jest` + `Testing Library` を別途構成予定**
 - `experimental-addon-test` もアンインストール済み（Vite 依存）
+- HeroUIコンポーネントのアクセシビリティテストはStorybook addon-a11yで対応
 
 ---
 
-## 🧼 その他
+## 🧼 トラブルシューティング
+
+### Storybook関連
 
 - `storybook-stories.js` エラー対策済み
 - Storybook が突然ビルド失敗した場合は、以下を試す：
 
 ```bash
 rm -rf node_modules/.cache storybook-static
-npm run storybook
+pnpm storybook
 ```
+
+### HeroUI関連
+
+- テーマ変更が反映されない場合：
+```bash
+# Next.jsキャッシュクリア
+rm -rf .next
+pnpm dev
+```
+
+- HeroUIコンポーネントのスタイルが適用されない場合：
+  - `tailwind.config.js` の HeroUI content設定を確認
+  - `src/app/providers.tsx` の HeroUIProvider設定を確認
 
 ---
 
 ## 👥 開発メモ
 
-- `.stories.tsx` は必要なページ・コンポーネントにのみ作成
-- Figma のトークンやスタイルは Tailwind CSS と共通化予定
+### HeroUIベースの開発方針
 
----
+- `.stories.tsx` は HeroUI コンポーネントのカスタマイズ・テスト用に作成
+- 独自コンポーネントは最小限に留め、HeroUIコンポーネントの組み合わせを優先
+- テーマカスタマイズは `src/app/providers.tsx` で集中管理
 
-### 📦 Firebase ドキュメント構成
+### 推奨開発フロー
+
+1. **HeroUIコンポーネント選定**: 要件に適したコンポーネントを確認
+2. **Storybookでプロトタイプ**: カスタマイズやバリアント検証
+3. **実装**: HeroUIのpropsとTailwindクラスで実現
+4. **テーマ調整**: 必要に応じてテーマシステムで微調整
 
 ---
 
@@ -176,10 +308,6 @@ Firestore のセキュリティルールやクエリ設計に合わせて `userI
 
 - `posts/{uid}/{postId}/{filename}.jpg` のような構造で保存
 - `imageUrls[]` にはこのパスから取得したダウンロード URL を格納
-
----
-
-### 🧩 型定義ルール（TypeScript）
 
 ---
 
