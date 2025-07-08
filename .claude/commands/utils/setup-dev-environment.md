@@ -1,11 +1,11 @@
 ---
-description: "開発環境の完全セットアップ"
+description: "HeroUIベース開発環境の完全セットアップ"
 allowed-tools: ["Bash", "FileSystem"]
 ---
 
-# 開発環境完全セットアップ
+# HeroUIベース開発環境完全セットアップ
 
-新しい環境でProject Templateプロジェクトの開発環境を完全構築します。
+新しい環境でProject Template HeroUIベースプロジェクトの開発環境を完全構築します。
 
 ## Prerequisites Check
 ```bash
@@ -49,9 +49,16 @@ if [[ ! -d ".git" ]]; then
   git clone https://github.com/sugawaramasaya/project-template.git .
 fi
 
-# 依存関係インストール
-echo "📦 Installing dependencies..."
+# 依存関係インストール（HeroUI含む）
+echo "📦 Installing dependencies with HeroUI..."
 pnpm install
+
+# HeroUI設定確認
+echo "🎨 Checking HeroUI configuration..."
+if ! grep -q "@heroui/react" package.json; then
+  echo "⚠️  HeroUI not found in dependencies"
+  echo "Run: pnpm add @heroui/react"
+fi
 
 # mise設定（Node.js、pnpmバージョン管理）
 if [[ -f ".mise.toml" ]]; then
@@ -139,6 +146,7 @@ cat > .vscode/settings.json << EOF
     ["clsx\\(([^)]*)\\)", "(?:'|\"|\\`)([^']*)(?:'|\"|\\`)"],
     ["className\\s*:\\s*['\"]([^'\"]*)['\"]"]
   ],
+  "heroui.intellisense.enabled": true,
   "emmet.includeLanguages": {
     "typescript": "html",
     "typescriptreact": "html"
@@ -155,12 +163,13 @@ cat > .vscode/extensions.json << EOF
     "dbaeumer.vscode-eslint",
     "ms-vscode.vscode-typescript-next",
     "fireflysemantics.vscode-storybook-nextjs",
-    "ms-playwright.playwright"
+    "ms-playwright.playwright",
+    "heroui.heroui-vscode"
   ]
 }
 EOF
 
-echo "✅ VS Code configuration created"
+echo "✅ VS Code configuration created with HeroUI support"
 ```
 
 ## Git Hooks Setup

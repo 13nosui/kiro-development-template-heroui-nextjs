@@ -1,11 +1,11 @@
 ---
-description: "包括的コードレビューと品質保証"
+description: "HeroUIベース包括的コードレビューと品質保証"
 allowed-tools: ["FileSystem", "Bash"]
 ---
 
-# 包括的コードレビュー
+# HeroUIベース包括的コードレビュー
 
-$ARGUMENTSの包括的な品質チェックを実行します。
+$ARGUMENTSのHeroUIベース包括的な品質チェックを実行します。
 
 ## Phase 1: 静的解析
 ```bash
@@ -22,16 +22,16 @@ npx prettier --check $ARGUMENTS
 npx @next/bundle-analyzer
 ```
 
-## Phase 2: 設計原則チェック
-**DESIGN_GUIDELINE.md準拠確認：**
-- [ ] カラートークン使用確認：`grep -r "text-\[var(--" $ARGUMENTS`
-- [ ] スペーシングトークン確認：`grep -r "p-\[var(--space-" $ARGUMENTS`
-- [ ] タイポグラフィクラス確認：`grep -r "text-\(small\|medium\|large\)" $ARGUMENTS`
+## Phase 2: HeroUIデザインシステムチェック
+**HeroUI準拠確認：**
+- [ ] HeroUIコンポーネント使用確認：`grep -r "from.*@heroui" $ARGUMENTS`
+- [ ] カスタムCSS使用チェック：`grep -r "className.*\[" $ARGUMENTS` （発見時は確認）
+- [ ] HeroUIテーマシステム確認：テーマカスタマイゼーションの適切性
 - [ ] 任意の値使用チェック：`grep -r "\[\d" $ARGUMENTS` （発見時は即座に修正）
 
 **AI_IMPLEMENTATION_RULES.md準拠確認：**
 - [ ] 禁止事項遵守確認
-- [ ] 実装フロー確認
+- [ ] HeroUIベース実装フロー確認
 - [ ] チェックリスト完全実行
 
 ## Phase 3: セキュリティ監査

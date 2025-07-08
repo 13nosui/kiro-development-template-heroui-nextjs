@@ -1,11 +1,11 @@
 ---
-description: "フルスタック機能の完全実装"
+description: "HeroUIベースフルスタック機能の完全実装"
 allowed-tools: ["FileSystem", "Bash", "figma"]
 ---
 
-# フルスタック機能完全開発
+# HeroUIベースフルスタック機能完全開発
 
-$ARGUMENTSの機能を以下のフルスタック手順で実装します。
+$ARGUMENTSの機能を以下のHeroUIベースフルスタック手順で実装します。
 
 ## Phase 1: 要件分析・設計
 **機能仕様の整理：**
@@ -17,7 +17,7 @@ $ARGUMENTSの機能を以下のフルスタック手順で実装します。
 [ユーザーストーリー形式で記述]
 
 ### 技術要件
-- フロントエンド：Next.js App Router
+- フロントエンド：Next.js App Router + HeroUI
 - バックエンド：Firebase Functions（必要時）
 - データベース：Firestore
 - 認証：Firebase Auth
@@ -27,6 +27,7 @@ $ARGUMENTSの機能を以下のフルスタック手順で実装します。
 - レスポンシブ対応：必須
 - アクセシビリティ：WCAG 2.1 AA準拠
 - パフォーマンス：Core Web Vitals準拠
+- デザインシステム：HeroUI準拠
 ```
 
 ## Phase 2: データベース設計
@@ -114,7 +115,7 @@ export function use${Feature}() {
 }
 ```
 
-## Phase 5: UI実装
+## Phase 5: HeroUI実装
 **Page Component：**
 ```typescript
 // app/${feature}/page.tsx
@@ -123,28 +124,35 @@ export function use${Feature}() {
 import { use${Feature} } from '@/hooks/use${Feature}';
 import { ${Feature}List } from '@/components/${Feature}List';
 import { ${Feature}Form } from '@/components/${Feature}Form';
+import { Card, CardHeader, CardBody, Spinner } from "@heroui/react";
 
 export default function ${Feature}Page() {
   const { data, loading, error, create${Feature} } = use${Feature}();
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <Spinner size="lg" className="flex justify-center" />;
   if (error) return <ErrorBoundary error={error} />;
 
   return (
-    <div className="container mx-auto px-[var(--space-16)] py-[var(--space-24)]">
-      <h1 className="text-large font-bold mb-[var(--space-24)]">
-        ${ARGUMENTS}
-      </h1>
-      <${Feature}Form onSubmit={create${Feature}} />
-      <${Feature}List data={data} />
+    <div className="container mx-auto p-6 max-w-6xl">
+      <Card>
+        <CardHeader>
+          <h1 className="text-2xl font-bold">
+            ${ARGUMENTS}
+          </h1>
+        </CardHeader>
+        <CardBody className="space-y-6">
+          <${Feature}Form onSubmit={create${Feature}} />
+          <${Feature}List data={data} />
+        </CardBody>
+      </Card>
     </div>
   );
 }
 ```
 
-**Component実装：**
+**HeroUIベースComponent実装：**
 - docs/AI_IMPLEMENTATION_RULES.md準拠
-- カスタムトークンのみ使用
+- HeroUIコンポーネントのみ使用
 - TypeScript strict mode
 - アクセシビリティ対応
 

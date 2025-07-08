@@ -1,11 +1,11 @@
 ---
-description: "本番環境への安全なデプロイメント"
+description: "HeroUIベース本番環境への安全なデプロイメント"
 allowed-tools: ["Bash", "FileSystem"]
 ---
 
-# 本番環境デプロイメント
+# HeroUIベース本番環境デプロイメント
 
-$ARGUMENTSを本番環境に安全にデプロイします。
+$ARGUMENTSをHeroUIベース本番環境に安全にデプロイします。
 
 ## Pre-Deploy チェック (必須)
 ```bash
@@ -114,6 +114,9 @@ curl -f "https://$DEPLOY_URL/api/health" || {
   exit 1
 }
 
+# HeroUIコンポーネント読み込み確認
+curl -s "https://$DEPLOY_URL" | grep -q "heroui" && echo "✅ HeroUI loaded" || echo "⚠️  HeroUI not detected"
+
 # 主要ページアクセス確認
 PAGES=("/" "/login" "/mypage" "/home" "/settings")
 for page in "${PAGES[@]}"; do
@@ -181,14 +184,19 @@ fi
 デプロイ完了後、以下のレポートを生成：
 
 ```markdown
-# Deployment Report - $(date)
+# HeroUI Deployment Report - $(date)
 
 ## Summary
-- **Project**: Project Template
+- **Project**: Project Template (HeroUI-based)
 - **Target**: $ARGUMENTS
 - **Deployment URL**: https://$DEPLOY_URL
 - **Git Commit**: $(git rev-parse HEAD)
 - **Deploy Time**: $(date)
+
+## HeroUI Integration Status
+- **HeroUI Components**: Loaded successfully
+- **Theme Configuration**: Applied
+- **Bundle Size Impact**: [Record impact]
 
 ## Quality Metrics
 - **Performance Score**: /100
@@ -198,6 +206,7 @@ fi
 
 ## Deploy Steps Completed
 - [ ] Pre-deploy quality checks
+- [ ] HeroUI bundle optimization
 - [ ] Firebase Functions deployment
 - [ ] Firestore rules deployment
 - [ ] Vercel production deployment

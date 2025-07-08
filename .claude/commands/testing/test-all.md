@@ -1,11 +1,11 @@
 ---
-description: "包括的テストスイート実行"
+description: "HeroUIベース包括的テストスイート実行"
 allowed-tools: ["Bash", "FileSystem"]
 ---
 
-# 包括的テストスイート実行
+# HeroUIベース包括的テストスイート実行
 
-$ARGUMENTSに対する全レベルのテストを実行します。
+$ARGUMENTSに対するHeroUIベース全レベルのテストを実行します。
 
 ## Unit Tests
 ```bash
@@ -24,8 +24,8 @@ echo "📊 Coverage Report Generated: coverage/lcov-report/index.html"
 
 ## Component Tests (Storybook)
 ```bash
-# Storybook テスト
-echo "📚 Running Component Tests..."
+# HeroUIベースStorybook テスト
+echo "📚 Running HeroUI Component Tests..."
 
 # 全ストーリー正常レンダリング確認
 npm run storybook:test
@@ -35,6 +35,9 @@ npm run storybook:chromatic
 
 # アクセシビリティテスト
 npm run storybook:a11y
+
+# HeroUIコンポーネント連携テスト
+npm run test:heroui-integration
 ```
 
 ## Integration Tests
