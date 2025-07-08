@@ -2,88 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #262626;
-  --foreground: #dedede;
-  --primary: #dedede;
-  --on-primary: #262626;
-  --secondary: #313131;
-  --on-secondary: #dedede;
-  --error: #ff5151;
-  --on-error: #ffffff;
-  --error-container: #ff8282;
-  --on-error-container: #ffffff;
-  --outline: #ffffffd9;
-  --outline-variant: #ffffff26;
-  --background: #ffffff0d;
-  --on-background: #dedede;
-  --surface: #262626;
-  --surface-dim: #313131;
-  --on-surface: #dedede;
-  --surface-variant: #ffffff0d;
-  --on-surface-variant: #9d9d9d;
-  --inverse-surface: #dedede;
-  --inverse-on-surface: #262626;
-  --inverse-surface-variant: #0000000d;
-  --inverse-on-surface-variant: #737373;
-  --shadow: #000000;
-  --scrim: #ffffff1a;
-  --surface-tint: #3c3c3c;
-  --inverse-primary: #262626;
-  --inverse-on-primary: #dedede;
-  --inverse-secondary: #dedede;
-  --inverse-on-secondary: #313131;
-  --inverse-error: #ffffff;
-  --inverse-on-error: #ff5151;
-  --inverse-error-container: #ffffff;
-  --inverse-on-error-container: #ff8282;
-
-  /* Spacing Tokens */
-  --space-4: 4px;
-  --space-8: 8px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-28: 28px;
-  --space-32: 32px;
-  --space-40: 40px;
-  --space-44: 44px;
-  --space-48: 48px;
-  --space-52: 52px;
-  --space-56: 56px;
-  --space-60: 60px;
-  --space-64: 64px;
-  --space-72: 72px;
-  --space-76: 76px;
-  --space-80: 80px;
-  --space-84: 84px;
-
-  /* Radius Tokens */
-  --radius-12: 12px;
-  --radius-24: 24px;
-  --radius-full: 999px;
-
-  /* Typography Tokens */
-  --font-family-base: "Noto Sans JP", sans-serif;
-
-  /* Weight */
-  --font-weight-bold: 700;
-  --font-weight-regular: 400;
-
-  /* Large */
-  --font-size-large: 21px;
-  --line-height-large: 28px;
-
-  /* Medium */
-  --font-size-medium: 18px;
-  --line-height-medium: 24px;
-
-  /* Small */
-  --font-size-small: 12px;
-  --line-height-small: 16px;
-}
-
 /* Removed unsupported @theme at-rule */
 
 @media (prefers-color-scheme: dark) {
@@ -97,24 +15,4 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Noto Sans JP", sans-serif;
-}
-
-/* オートコンプリート対策（クロスブラウザ） */
-input:-webkit-autofill,
-textarea:-webkit-autofill,
-.textfield-input:-webkit-autofill,
-.textfield-input:-internal-autofill-selected {
-  background-color: transparent;
-  color: var(--on-surface);
-  -webkit-text-fill-color: var(--on-surface);
-  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
-  box-shadow: 0 0 0px 1000px transparent inset;
-  background-clip: content-box;
-  caret-color: var(--on-surface);
-  transition: background-color 9999s ease-in-out 0s;
-}
-
-/* モーダル背景色用クラス */
-.modal-bg {
-  background-color: var(--surface-tint);
 }
