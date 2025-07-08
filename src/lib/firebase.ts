@@ -1,6 +1,17 @@
 // src/lib/firebase.ts
 import { initializeApp } from "firebase/app";
-import { getAuth, User, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, AuthError, GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { 
+  getAuth, 
+  User, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  sendEmailVerification, 
+  AuthError, 
+  GoogleAuthProvider, 
+  signInWithCredential,
+  signInWithPopup,
+  signOut as firebaseSignOut
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -26,6 +37,27 @@ export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
 export const storage = app ? getStorage(app) : null;
 
+// Google OAuth Provider
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
+// OAuth with Google
+export async function signInWithGoogle() {
+  if (!auth) {
+    return { success: false, error: 'Firebase is not configured properly', code: 'auth/not-configured' };
+  }
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return { success: true, user: result.user };
+  } catch (error) {
+    const authError = error as AuthError;
+    return { success: false, error: authError.message, code: authError.code };
+  }
+}
+
+// Legacy function for compatibility
 export async function loginWithFirebase(idToken: string) {
   if (!auth) {
     throw new Error('Firebase is not configured properly');
@@ -34,6 +66,7 @@ export async function loginWithFirebase(idToken: string) {
   await signInWithCredential(auth, credential);
 }
 
+// Email/Password Authentication
 export async function registerWithEmail(email: string, password: string) {
   if (!auth) {
     return { success: false, error: 'Firebase is not configured properly', code: 'auth/not-configured' };
@@ -56,6 +89,20 @@ export async function loginWithEmail(email: string, password: string) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return { success: true, user: userCredential.user };
+  } catch (error) {
+    const authError = error as AuthError;
+    return { success: false, error: authError.message, code: authError.code };
+  }
+}
+
+// Sign Out
+export async function signOut() {
+  if (!auth) {
+    return { success: false, error: 'Firebase is not configured properly' };
+  }
+  try {
+    await firebaseSignOut(auth);
+    return { success: true };
   } catch (error) {
     const authError = error as AuthError;
     return { success: false, error: authError.message, code: authError.code };
