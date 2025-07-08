@@ -253,6 +253,263 @@ const customTheme = {
 
 ---
 
+## 🎯 アイコンシステム
+
+### Material UI Icons - 標準アイコンライブラリ
+
+このプロジェクトでは **Material UI Icons** を標準アイコンライブラリとして使用します。一貫性とデザイン品質の維持のため、アイコンが必要な場合は Material UI Icons を優先的に使用してください。
+
+#### 基本的な使用方法
+
+```tsx
+import { 
+  Home,
+  Search,
+  Settings,
+  AccountCircle,
+  Add,
+  Delete,
+  Edit,
+  Save,
+  Cancel,
+  Check,
+  Close
+} from "@mui/icons-material";
+
+// ✅ HeroUIボタンと組み合わせた使用
+<Button 
+  color="primary" 
+  startContent={<Save />}
+>
+  保存
+</Button>
+
+<Button 
+  color="danger" 
+  variant="bordered"
+  startContent={<Delete />}
+>
+  削除
+</Button>
+
+// ✅ アイコンのみのボタン
+<Button 
+  isIconOnly 
+  color="primary" 
+  variant="light"
+  aria-label="設定"
+>
+  <Settings />
+</Button>
+
+// ✅ インプットとの組み合わせ
+<Input
+  type="search"
+  placeholder="検索..."
+  startContent={<Search />}
+  variant="bordered"
+/>
+```
+
+#### アイコンサイズとスタイリング
+
+```tsx
+// サイズ調整
+<Home fontSize="small" />     // 20px
+<Home fontSize="medium" />    // 24px (デフォルト)
+<Home fontSize="large" />     // 35px
+
+// カスタムサイズ
+<Home sx={{ fontSize: 16 }} />
+<Home style={{ fontSize: '18px' }} />
+
+// カラー調整（Tailwind CSS使用時）
+<Settings className="text-primary-500" />
+<Delete className="text-danger-500" />
+<Check className="text-success-500" />
+```
+
+#### HeroUIコンポーネントとの統合
+
+```tsx
+// ✅ Navbar での使用
+<Navbar>
+  <NavbarContent>
+    <NavbarItem>
+      <Button isIconOnly variant="light">
+        <Home />
+      </Button>
+    </NavbarItem>
+  </NavbarContent>
+</Navbar>
+
+// ✅ Card での使用
+<Card>
+  <CardHeader className="flex gap-3">
+    <Avatar icon={<AccountCircle />} />
+    <div className="flex flex-col">
+      <p className="text-md">ユーザー設定</p>
+    </div>
+  </CardHeader>
+</Card>
+
+// ✅ Chip での使用
+<Chip
+  startContent={<Check />}
+  color="success"
+  variant="flat"
+>
+  完了
+</Chip>
+```
+
+### よく使用されるアイコンカテゴリ
+
+#### ナビゲーション・UI基本
+```tsx
+import {
+  Home,           // ホーム
+  ArrowBack,      // 戻る
+  ArrowForward,   // 進む
+  Menu,           // メニュー
+  Close,          // 閉じる
+  ExpandMore,     // 展開
+  ExpandLess,     // 折りたたみ
+  MoreVert,       // その他（縦3点）
+  MoreHoriz       // その他（横3点）
+} from "@mui/icons-material";
+```
+
+#### アクション系
+```tsx
+import {
+  Add,            // 追加
+  Edit,           // 編集
+  Delete,         // 削除
+  Save,           // 保存
+  Cancel,         // キャンセル
+  Check,          // チェック
+  Refresh,        // 更新
+  Download,       // ダウンロード
+  Upload,         // アップロード
+  Share           // 共有
+} from "@mui/icons-material";
+```
+
+#### データ・ファイル系
+```tsx
+import {
+  Search,         // 検索
+  FilterList,     // フィルター
+  Sort,           // ソート
+  Folder,         // フォルダ
+  InsertDriveFile,// ファイル
+  Image,          // 画像
+  VideoFile,      // 動画
+  AudioFile       // 音声
+} from "@mui/icons-material";
+```
+
+#### ユーザー・認証系
+```tsx
+import {
+  AccountCircle,  // アカウント
+  Person,         // ユーザー
+  Group,          // グループ
+  Settings,       // 設定
+  Lock,           // ロック
+  LockOpen,       // ロック解除
+  Visibility,     // 表示
+  VisibilityOff,  // 非表示
+  Login,          // ログイン
+  Logout          // ログアウト
+} from "@mui/icons-material";
+```
+
+#### 通知・ステータス系
+```tsx
+import {
+  Notifications,     // 通知
+  NotificationsOff,  // 通知オフ
+  Warning,           // 警告
+  Error,             // エラー
+  CheckCircle,       // 成功
+  Info,              // 情報
+  Help,              // ヘルプ
+  Star,              // お気に入り
+  StarBorder         // お気に入り（空）
+} from "@mui/icons-material";
+```
+
+### アイコン使用時の注意事項
+
+#### ✅ 推奨事項
+- **Material UI Iconsを最優先で使用**
+- **HeroUIコンポーネントのpropsでサイズ指定** (`size="sm"`, `size="md"`, `size="lg"`)
+- **意味的に適切なアイコンの選択**（例：削除には`Delete`、編集には`Edit`）
+- **aria-label の適切な設定**（アクセシビリティ向上）
+- **一貫したアイコンスタイル**（同じUIエリア内で統一されたサイズ・色）
+
+#### ❌ 禁止事項
+- **複数のアイコンライブラリの混在使用**
+- **Material UI Icons以外のアイコンライブラリの新規追加**
+- **独自SVGアイコンの作成**（Material UI Iconsで代替可能な場合）
+- **不適切なサイズ指定**（UIの一貫性を損なう極端なサイズ）
+
+#### 例外ケース
+以下の場合のみ、他のアイコンライブラリまたは独自アイコンの使用を認める：
+- **ブランド固有のアイコン**（企業ロゴ、サービス固有アイコン）
+- **Material UI Iconsに存在しない専門的なアイコン**
+- **デザインシステムで明確に定義された独自アイコン**
+
+### パフォーマンス最適化
+
+```tsx
+// ✅ 必要なアイコンのみインポート
+import { Save, Delete, Edit } from "@mui/icons-material";
+
+// ❌ 全体インポートは避ける
+import * as Icons from "@mui/icons-material";
+
+// ✅ 動的インポート（大量のアイコンを使用する場合）
+const DynamicIcon = dynamic(() => import("@mui/icons-material/Settings"), {
+  loading: () => <div className="w-6 h-6 bg-gray-200 rounded" />,
+});
+```
+
+### TypeScript型定義
+
+```tsx
+import { SvgIconProps } from "@mui/icons-material";
+
+// アイコンコンポーネントの型定義
+interface IconButtonProps {
+  icon: React.ComponentType<SvgIconProps>;
+  label: string;
+  onClick: () => void;
+}
+
+const IconButton: React.FC<IconButtonProps> = ({ icon: Icon, label, onClick }) => (
+  <Button 
+    isIconOnly 
+    variant="light" 
+    aria-label={label}
+    onPress={onClick}
+  >
+    <Icon />
+  </Button>
+);
+
+// 使用例
+<IconButton 
+  icon={Settings} 
+  label="設定を開く" 
+  onClick={() => console.log('設定画面を開く')} 
+/>
+```
+
+---
+
 ## 📱 レスポンシブデザイン対応
 
 ### HeroUI + Tailwind CSSの組み合わせ
@@ -475,15 +732,29 @@ const DataTable = dynamic(() => import("@heroui/react").then(mod => mod.Table), 
 # 新規UI実装時
 HeroUIコンポーネントを使用して、[具体的な内容]を実装してください。
 可能な限りvariant、size、colorプロパティで要件を満たしてください。
+アイコンが必要な場合は、Material UI Iconsを使用してください。
 
 # 既存UI更新時  
 既存の独自コンポーネントを、対応するHeroUIコンポーネントに置き換えてください。
 デザインの一貫性を保ちながら、HeroUIの機能を最大限活用してください。
+アイコンはMaterial UI Iconsで統一してください。
 
 # カスタマイズが必要な場合
 HeroUIのテーマシステムまたはclassNamesプロパティを使用して、
 [具体的な要件]を実現してください。独自CSSの追加は最小限に留めてください。
+
+# アイコン実装時
+Material UI Iconsから適切なアイコンを選択し、HeroUIコンポーネントと組み合わせて使用してください。
+意味的に適切なアイコンを選択し、aria-labelでアクセシビリティを確保してください。
 ```
+
+### アイコン実装時の確認事項
+- [ ] **Material UI Iconsを使用しているか**
+- [ ] **意味的に適切なアイコンを選択しているか**
+- [ ] **HeroUIコンポーネントと適切に統合されているか**
+- [ ] **aria-labelが設定されているか**（アイコンのみボタンの場合）
+- [ ] **UIエリア内でアイコンサイズが統一されているか**
+- [ ] **必要なアイコンのみインポートしているか**（パフォーマンス確保）
 
 ---
 

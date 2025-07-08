@@ -5,7 +5,7 @@
 - Styling: Tailwind CSS + HeroUI
 - UI Components: HeroUI デザインシステム
 - Storybook: v8.6.14
-- Icons: @svgr/webpack
+- Icons: Material UI Icons (@mui/icons-material)
 - Backend: Firebase (Auth/Firestore/Storage)
 - Hosting: Vercel
 - Language: TypeScript
