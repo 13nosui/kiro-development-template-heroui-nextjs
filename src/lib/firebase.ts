@@ -228,8 +228,7 @@ export async function requestPasswordReset(email: string): Promise<AuthResult> {
     return { success: true };
   } catch (error) {
     const authError = error as AuthError;
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const secureError = createSecureErrorResponse(authError, isDevelopment);
+    console.error('Password reset error:', authError);
     
     // セキュリティのため、常に成功を返す（ユーザー存在確認を防ぐ）
     return { success: true };
