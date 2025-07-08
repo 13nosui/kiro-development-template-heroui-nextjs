@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User } from "firebase/auth";
-import { auth, onAuthStateChanged, signOut as firebaseSignOut } from "./firebase";
+import { onAuthStateChanged, signOut as firebaseSignOut } from "./firebase";
 
 interface AuthContextType {
   user: User | null;
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!result.success) {
         setError(result.error || "ログアウトに失敗しました");
       }
-    } catch (err) {
+    } catch {
       setError("ログアウトに失敗しました");
     } finally {
       setLoading(false);
