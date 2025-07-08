@@ -10,9 +10,8 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
   
-  // ESLint設定（Vercelビルド対応）
   eslint: {
-    ignoreDuringBuilds: true, // ビルド時のESLintエラーを無視
+    ignoreDuringBuilds: true, // ビルド時にESLintエラーを無視
   },
   
   webpack(config) {

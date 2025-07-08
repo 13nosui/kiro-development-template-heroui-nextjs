@@ -30,7 +30,7 @@ export async function GET(
   } catch (error) {
     console.error("Figma API Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch Figma file" },
+      { error: "Failed to fetch Figma data" },
       { status: 500 }
     );
   }
