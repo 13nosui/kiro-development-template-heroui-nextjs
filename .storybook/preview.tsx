@@ -2,6 +2,7 @@
 import React from "react";
 import type { Preview } from "@storybook/react";
 import "../src/app/globals.css";
+import { HeroUIProvider } from "@heroui/react";
 
 const preview: Preview = {
   parameters: {
@@ -12,9 +13,11 @@ const preview: Preview = {
 export const decorators = [
   (Story) => {
     return (
-      <div style={{ minHeight: "100vh", backgroundColor: "var(--background)" }}>
-        <Story />
-      </div>
+      <HeroUIProvider>
+        <div className="min-h-screen bg-background text-foreground">
+          <Story />
+        </div>
+      </HeroUIProvider>
     );
   },
 ];

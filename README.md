@@ -1,27 +1,196 @@
-# Project Template
+# Project Template - HeroUI & Next.js
 
-このリポジトリは Figma Dev Mode MCP サーバーと Copilot の提供でお送りします。
+このリポジトリは、**HeroUI** コンポーネントライブラリと **Next.js** を活用したモダンなWebアプリケーション開発テンプレートです。美しく一貫性のあるUIと優れた開発体験を提供します。
 
-## Figma Dev Mode MCP サーバー連携手順
+## ✨ 主な特徴
 
-1. `.env.local` に Figma の Webhook Secret と Personal Access Token を設定してください。
+- 🎨 **HeroUI**: 美しいデザインシステムとアクセシブルなコンポーネント
+- ⚡ **Next.js 14**: App Router による最新のReact開発環境
+- 🎯 **TypeScript**: 型安全な開発体験
+- 🎨 **Tailwind CSS**: ユーティリティファーストCSSフレームワーク
+- 📚 **Storybook**: コンポーネント開発・ドキュメント環境
+- 🔥 **Firebase**: 認証・データベース・ストレージの統合バックエンド
 
-   - `FIGMA_WEBHOOK_SECRET` : Figma Webhook 作成時に発行されるシークレット
-   - `FIGMA_PERSONAL_ACCESS_TOKEN` : Figma の個人アクセストークン（必要に応じて）
+## 🚀 クイックスタート
 
-2. Figma の[Dev Mode](https://www.figma.com/developers/api#webhooks)で Webhook を作成し、エンドポイント URL に `https://<your-domain>/api/figma-mcp` を指定してください。
+### 1. 環境セットアップ
 
-   - 署名検証のため、Webhook 作成時のシークレットを`.env.local`に設定してください。
+```bash
+# miseによるNode.js・pnpmのバージョン管理
+brew install mise
+mise install
 
-3. サーバー起動
+# 依存関係のインストール
+pnpm install
+```
 
-   ```sh
-   npm run dev
-   ```
+### 2. 環境変数設定
 
-4. Figma からのイベント（例: FILE_UPDATE）が API で受信できるようになります。
+`.env.local` を作成し、Firebase設定を追加：
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+### 3. 開発サーバー起動
+
+```bash
+# Next.js 開発サーバー
+pnpm dev
+
+# Storybook (コンポーネント開発)
+pnpm storybook
+```
+
+## 🎨 HeroUI活用ガイド
+
+### 基本的なコンポーネント使用例
+
+```tsx
+import { Button, Input, Card, CardBody } from "@heroui/react";
+
+export default function ExampleForm() {
+  return (
+    <Card className="max-w-md">
+      <CardBody className="space-y-4">
+        <Input
+          type="email"
+          label="メールアドレス"
+          placeholder="you@example.com"
+          variant="bordered"
+        />
+        <Input
+          type="password"
+          label="パスワード"
+          variant="bordered"
+        />
+        <Button color="primary" fullWidth>
+          ログイン
+        </Button>
+      </CardBody>
+    </Card>
+  );
+}
+```
+
+### テーマカスタマイズ
+
+HeroUIのテーマシステムでプロジェクト固有のデザインを実現：
+
+```tsx
+// src/app/providers.tsx
+import { HeroUIProvider } from "@heroui/react";
+
+const customTheme = {
+  extend: "dark",
+  colors: {
+    primary: {
+      DEFAULT: "#3b82f6",
+      foreground: "#ffffff",
+    },
+  },
+};
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <HeroUIProvider theme={customTheme}>
+      {children}
+    </HeroUIProvider>
+  );
+}
+```
+
+## 📁 プロジェクト構成
+
+```
+src/
+├── app/                 # Next.js App Router
+│   ├── layout.tsx      # ルートレイアウト (HeroUIProvider設定)
+│   ├── page.tsx        # ホームページ
+│   └── providers.tsx   # HeroUIプロバイダー設定
+├── components/         # 再利用可能コンポーネント
+├── lib/               # ユーティリティ・設定
+│   └── firebase.ts    # Firebase初期化
+└── stories/           # Storybookファイル
+```
+
+## 🛠 開発ツール
+
+### Storybook でのコンポーネント開発
+
+```bash
+pnpm storybook
+```
+
+HeroUIコンポーネントの組み合わせやカスタマイズをStorybookで確認・テストできます。
+
+### 型安全性の確保
+
+```bash
+# TypeScript型チェック
+pnpm type-check
+
+# ESLint によるコード品質チェック
+pnpm lint
+```
+
+## 🎯 開発ガイドライン
+
+詳細な開発ガイドラインは以下を参照：
+
+- **[DESIGN_GUIDELINE.md](./DESIGN_GUIDELINE.md)**: HeroUIベースのデザイン実装ガイド
+- **[README.dev.md](./README.dev.md)**: 詳細な開発環境・技術仕様
+
+### 推奨ワークフロー
+
+1. **コンポーネント設計**: HeroUIの既存コンポーネントで要件を満たせるか確認
+2. **Storybook開発**: 独立した環境でコンポーネントを開発・テスト
+3. **型安全実装**: TypeScriptの型システムを活用
+4. **アクセシビリティ**: HeroUIの組み込み機能を活用
+
+## 🚀 デプロイ
+
+### Vercel への自動デプロイ
+
+1. GitHubリポジトリをVercelに接続
+2. 環境変数をVercelダッシュボードで設定
+3. `main` ブランチへのプッシュで自動デプロイ
+
+```bash
+# プロダクションビルドの確認
+pnpm build
+pnpm start
+```
+
+## 📚 リソース
+
+### 公式ドキュメント
+- [HeroUI Documentation](https://www.heroui.com/)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Firebase](https://firebase.google.com/docs)
+
+### コミュニティ
+- [HeroUI Discord](https://discord.gg/heroui)
+- [Next.js Discord](https://nextjs.org/discord)
+
+## 🤝 コントリビューション
+
+1. このリポジトリをフォーク
+2. フィーチャーブランチを作成: `git checkout -b feature/amazing-feature`
+3. 変更をコミット: `git commit -m 'Add amazing feature'`
+4. ブランチにプッシュ: `git push origin feature/amazing-feature`
+5. プルリクエストを作成
+
+## 📄 ライセンス
+
+このプロジェクトは MIT ライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
 
 ---
 
-Figma MCP サーバーの API エンドポイントは `src/pages/api/figma-mcp.ts` です。
-署名検証やイベントごとの処理はこのファイルで拡張してください。
+**HeroUI + Next.js で美しく機能的なWebアプリケーションを構築しましょう！** ✨
