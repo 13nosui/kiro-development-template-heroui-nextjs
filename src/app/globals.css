@@ -1,18 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Removed unsupported @theme at-rule */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #262626;
-    --foreground: #dedede;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Noto Sans JP", sans-serif;
-}
