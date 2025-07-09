@@ -5,10 +5,7 @@ disable-default-queries: false
 # 実行するクエリスイートの設定
 queries:
   # セキュリティ関連のクエリを優先
-  - name: security-extended
-    uses: security-extended
-  - name: security-and-quality
-    uses: security-and-quality
+  uses: security-and-quality
 
 # パス設定
 paths:
@@ -43,7 +40,7 @@ packs:
   - codeql/javascript-queries
   # React セキュリティパック
   - codeql/javascript-queries:Security
-  # TypeScript セキュリティパック  
+  # TypeScript セキュリティパック
   - codeql/javascript-queries:security-extended
 
 # カスタムクエリの設定（プロジェクト固有）
@@ -59,7 +56,7 @@ query-filters:
         - security
   # 重要度の高いセキュリティ問題のみ
   - include:
-      severity: 
+      severity:
         - error
         - warning
   # 情報レベルの問題は除外（ノイズ削減）
@@ -74,7 +71,7 @@ languages:
       # ECMAScript 2022以降の構文をサポート
       typescript: true
       jsx: true
-      
+
   typescript:
     # TypeScript固有の設定
     extractor:
