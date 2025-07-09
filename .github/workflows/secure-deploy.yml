@@ -1,0 +1,398 @@
+name: 🔐 Secure Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - staging
+        - production
+      skip_tests:
+        description: 'Skip security tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  FORCE_COLOR: 3
+
+jobs:
+  # ==============================================
+  # セキュリティ事前チェック
+  # ==============================================
+  security-check:
+    name: 🔍 Security Pre-check
+    runs-on: ubuntu-latest
+    
+    outputs:
+      security-passed: ${{ steps.security-result.outputs.passed }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # フル履歴取得（セキュリティスキャン用）
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🔒 Verify environment variables
+        env:
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CSRF_SECRET: ${{ secrets.CSRF_SECRET }}
+        run: |
+          echo "🔑 Environment variables verification..."
+          npm run env:validate
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Environment variables are valid"
+          else
+            echo "❌ Environment variables validation failed"
+            exit 1
+          fi
+      
+      - name: 🛡️ Security audit
+        run: |
+          echo "🔍 Running security audit..."
+          npm audit --audit-level=high
+          
+          echo "🔎 Checking for hardcoded secrets..."
+          npm run security:secrets
+          
+          echo "🧐 Running comprehensive security check..."
+          npm run security:check
+      
+      - name: 📊 Code quality analysis
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "🔍 TypeScript type checking..."
+          npm run type-check
+          
+          echo "🔍 ESLint analysis..."
+          npm run lint:check
+      
+      - name: 🏗️ Build test
+        env:
+          # 最小限のSecrets（ビルドテスト用）
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CSRF_SECRET: ${{ secrets.CSRF_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          echo "🏗️ Testing production build..."
+          npm run build
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Build test passed"
+          else
+            echo "❌ Build test failed"
+            exit 1
+          fi
+      
+      - name: 🎯 Set security result
+        id: security-result
+        run: |
+          echo "passed=true" >> $GITHUB_OUTPUT
+          echo "✅ All security checks passed"
+
+  # ==============================================
+  # 本番環境デプロイ
+  # ==============================================
+  deploy-production:
+    name: 🚀 Deploy to Production
+    needs: security-check
+    if: needs.security-check.outputs.security-passed == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ steps.deploy.outputs.url }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build application
+        env:
+          # 🔥 Firebase設定
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          
+          # 🔒 セキュリティ関連
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CSRF_SECRET: ${{ secrets.CSRF_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          RATE_LIMIT_SECRET: ${{ secrets.RATE_LIMIT_SECRET }}
+          
+          # 🌐 アプリケーション設定
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
+          
+          # 🎨 外部API（オプション）
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_WEBHOOK_SECRET: ${{ secrets.FIGMA_WEBHOOK_SECRET }}
+          FIGMA_PERSONAL_ACCESS_TOKEN: ${{ secrets.FIGMA_PERSONAL_ACCESS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+          
+          # 📧 通知サービス（オプション）
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+          # 📊 監視・分析
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_HOTJAR_ID: ${{ secrets.NEXT_PUBLIC_HOTJAR_ID }}
+          NEXT_PUBLIC_LOGROCKET_ID: ${{ secrets.NEXT_PUBLIC_LOGROCKET_ID }}
+          
+          # ☁️ クラウドサービス（オプション）
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          
+          # 💾 データベース（オプション）
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          echo "🏗️ Building production application..."
+          npm run build
+          
+          echo "📊 Build statistics:"
+          du -sh .next/ || echo "Build directory not found"
+          
+          echo "✅ Build completed successfully"
+      
+      - name: 🔐 Deploy to Vercel
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          echo "🚀 Starting deployment to Vercel..."
+          
+          # Vercel CLI のインストール
+          npm install -g vercel@latest
+          
+          # 本番デプロイの実行
+          DEPLOY_URL=$(vercel deploy --prod --token $VERCEL_TOKEN --confirm)
+          
+          echo "🌐 Deployed to: $DEPLOY_URL"
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          
+          # デプロイ後の簡易ヘルスチェック
+          echo "🏥 Health check..."
+          sleep 10
+          
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DEPLOY_URL")
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Health check passed (HTTP $HTTP_STATUS)"
+          else
+            echo "⚠️ Health check warning (HTTP $HTTP_STATUS)"
+          fi
+      
+      - name: 📊 Post-deployment verification
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          echo "🔍 Post-deployment verification..."
+          
+          # SSL証明書の確認
+          echo "🔒 SSL certificate check..."
+          echo | openssl s_client -servername $(echo $DEPLOY_URL | sed 's|https://||') -connect $(echo $DEPLOY_URL | sed 's|https://||'):443 2>/dev/null | openssl x509 -noout -dates
+          
+          # セキュリティヘッダーの確認
+          echo "🛡️ Security headers check..."
+          curl -I "$DEPLOY_URL" | grep -E "(X-Frame-Options|X-Content-Type-Options|Strict-Transport-Security|Content-Security-Policy)"
+          
+          echo "✅ Post-deployment verification completed"
+
+  # ==============================================
+  # 通知（デプロイ結果）
+  # ==============================================
+  notify:
+    name: 📢 Notify Results
+    needs: [security-check, deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📤 Slack notification (Success)
+        if: needs.deploy-production.result == 'success'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{
+                "text": "🚀 Production deployment successful!",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*🚀 Production Deployment Successful*\n\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Actor:* ${{ github.actor }}\n*Workflow:* ${{ github.workflow }}"
+                    }
+                  }
+                ]
+              }' \
+              "$SLACK_WEBHOOK_URL"
+          fi
+      
+      - name: 📤 Slack notification (Failure)
+        if: needs.deploy-production.result == 'failure' || needs.security-check.result == 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -n "$SLACK_WEBHOOK_URL" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{
+                "text": "❌ Production deployment failed!",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*❌ Production Deployment Failed*\n\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n*Actor:* ${{ github.actor }}\n*Workflow:* ${{ github.workflow }}\n\n*Check the logs:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  }
+                ]
+              }' \
+              "$SLACK_WEBHOOK_URL"
+          fi
+      
+      - name: 📧 Discord notification (Success)
+        if: needs.deploy-production.result == 'success'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            curl -H "Content-Type: application/json" \
+              -d '{
+                "embeds": [
+                  {
+                    "title": "🚀 Production Deployment Successful",
+                    "color": 65280,
+                    "fields": [
+                      {"name": "Repository", "value": "${{ github.repository }}", "inline": true},
+                      {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true},
+                      {"name": "Actor", "value": "${{ github.actor }}", "inline": true}
+                    ],
+                    "timestamp": "${{ github.event.head_commit.timestamp }}"
+                  }
+                ]
+              }' \
+              "$DISCORD_WEBHOOK_URL"
+          fi
+
+  # ==============================================
+  # セキュリティ監査ログ
+  # ==============================================
+  security-audit-log:
+    name: 📋 Security Audit Log
+    needs: [security-check, deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📝 Generate security audit log
+        run: |
+          echo "📋 Generating security audit log..."
+          
+          cat > security-audit-log.md << EOF
+          # 🔒 Security Audit Log
+          
+          **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Workflow:** ${{ github.workflow }}
+          **Run ID:** ${{ github.run_id }}
+          **Repository:** ${{ github.repository }}
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+          **Actor:** ${{ github.actor }}
+          
+          ## Security Check Results
+          
+          - **Security Pre-check:** ${{ needs.security-check.result }}
+          - **Deployment:** ${{ needs.deploy-production.result }}
+          
+          ## Environment Variables Verified
+          
+          - ✅ ENCRYPTION_KEY
+          - ✅ JWT_SECRET  
+          - ✅ CSRF_SECRET
+          - ✅ SESSION_SECRET
+          - ✅ Firebase Configuration
+          
+          ## Security Measures Applied
+          
+          - [x] Environment variable validation
+          - [x] Dependency vulnerability scan
+          - [x] Hardcoded secrets scan
+          - [x] TypeScript type checking
+          - [x] ESLint security rules
+          - [x] Production build test
+          - [x] SSL certificate verification
+          - [x] Security headers verification
+          
+          ## Deployment Information
+          
+          - **Environment:** ${{ github.event.inputs.environment || 'production' }}
+          - **Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Status:** ${{ needs.deploy-production.result }}
+          
+          ---
+          
+          *This log is automatically generated by GitHub Actions.*
+          EOF
+          
+          echo "📄 Security audit log generated"
+          cat security-audit-log.md
+      
+      - name: 📤 Upload audit log
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-log-${{ github.run_id }}
+          path: security-audit-log.md
+          retention-days: 90

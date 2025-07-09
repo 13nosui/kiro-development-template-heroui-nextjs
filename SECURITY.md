@@ -79,14 +79,59 @@ if (!validateEmail(email)) {
 
 ### 5. 環境変数とシークレット管理
 
-#### 環境変数テンプレート
-```bash
-# .env.local の例
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-FIGMA_ACCESS_TOKEN=your_figma_token
-ENCRYPTION_KEY=your_32_character_encryption_key
+#### 🔐 セキュアなデータ保存・機密情報管理（新機能）
+
+**概要**: プロジェクトには包括的な機密情報管理システムが実装されています。
+
+**主要機能**:
+- **AES-256-GCM 暗号化**: 最高レベルのデータ暗号化
+- **セキュアストレージ**: 複数ストレージタイプ対応
+- **GitHub Secrets 統合**: CI/CD パイプラインでの安全な機密情報管理
+- **自動セキュリティ監査**: デプロイ時の包括的セキュリティチェック
+
+#### 実装されたセキュリティ機能
+
+##### 🔒 暗号化ユーティリティ (`src/lib/crypto.ts`)
+```typescript
+import { encrypt, decrypt, encryptObject, decryptObject } from '@/lib/crypto';
+
+// データの暗号化
+const encryptedData = encrypt('sensitive information');
+
+// オブジェクトの暗号化
+const encryptedUser = encryptObject({ id: 123, email: 'user@example.com' });
 ```
+
+##### 🔐 セキュアストレージ (`src/lib/secure-storage.ts`)
+```typescript
+import { secureStorage, tokenManager } from '@/lib/secure-storage';
+
+// 暗号化されたデータ保存
+await secureStorage.setItem('userPreferences', { theme: 'dark' });
+
+// トークン管理
+await tokenManager.setAccessToken('jwt_token', 3600);
+```
+
+##### 📋 環境変数テンプレート (`.env.example`)
+完全な環境変数テンプレートが `.env.example` ファイルに提供されています：
+```bash
+# セキュリティ関連（必須）
+ENCRYPTION_KEY=your_32_character_encryption_key_here
+JWT_SECRET=your_jwt_secret_key_with_special_characters_32_chars_min
+CSRF_SECRET=your_csrf_secret_key_with_special_chars_32_min
+SESSION_SECRET=your_session_secret_key_64_characters_minimum
+
+# Firebase設定
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+```
+
+##### 🚀 GitHub Secrets 統合
+- **セキュアデプロイワークフロー**: `.github/workflows/secure-deploy.yml`
+- **多段階セキュリティチェック**: 環境変数検証、脆弱性スキャン、ビルドテスト
+- **自動通知**: Slack/Discord 通知
+- **セキュリティ監査ログ**: デプロイ時の詳細ログ記録
 
 ## 🛡️ セキュリティベストプラクティス
 

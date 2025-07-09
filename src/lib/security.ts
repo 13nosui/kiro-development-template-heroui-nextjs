@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import validator from 'validator';
+import crypto from 'crypto';
 import { ValidationError } from './validation';
 
 // XSS対策関連
@@ -123,9 +124,13 @@ export const csrfProtection = {
       return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     }
     
-    // フォールバック（サーバーサイドまたは古いブラウザ）
-    return Math.random().toString(36).substring(2) + 
-           Math.random().toString(36).substring(2);
+    // フォールバック（サーバーサイドの場合）
+    try {
+      return crypto.randomBytes(32).toString('hex');
+    } catch {
+      // crypto モジュールが利用できない場合のフォールバック
+      throw new Error('Secure random generation is not available');
+    }
   },
 
   // CSRFトークンの検証
