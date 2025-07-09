@@ -32,7 +32,7 @@
 ## 📁 Project Structure
 
 ```
-project-template/
+ai-development-template-heroui-nextjs/
 ├── src/
 │   ├── app/              # Next.js App Router pages
 │   │   ├── layout.tsx    # Root layout with HeroUIProvider

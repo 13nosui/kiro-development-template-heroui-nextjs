@@ -25,7 +25,7 @@
 - `cursor/remove-all-existing-custom-components-d1e9`
 - `cursor/remove-custom-tokens-and-unify-with-heroui-f3b4`
 - `cursor/remove-specific-styles-from-globals-css-a5ab`
-- `cursor/replace-nidomi-with-project-template-6a7a`
+- `cursor/replace-nidomi-with-ai-development-template-heroui-nextjs-6a7a`
 - `cursor/resolve-development-build-errors-44ec`
 - `cursor/revise-documentation-to-align-with-heroui-2237`
 - `cursor/rewrite-files-to-heroui-format-2dc6`

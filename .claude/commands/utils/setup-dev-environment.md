@@ -46,7 +46,7 @@ echo "✅ Prerequisites check complete"
 # リポジトリクローン（新規の場合）
 if [[ ! -d ".git" ]]; then
   echo "📂 Cloning repository..."
-  git clone https://github.com/sugawaramasaya/project-template.git .
+  git clone https://github.com/sugawaramasaya/ai-development-template-heroui-nextjs.git .
 fi
 
 # 依存関係インストール（HeroUI含む）

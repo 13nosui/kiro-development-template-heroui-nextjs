@@ -51,7 +51,7 @@
 
 【対象】: components/Button.tsx
 【変更内容】: 
-  - --primary-blue → --project-template-blue-70 に変更
+  - --primary-blue → --ai-development-template-heroui-nextjs-blue-70 に変更
   - --text-dark → --on-surface に変更
 【参照デザイン】: [Figmaリンク]
 【変更しない要素】: レイアウト、サイズ、余白は現状維持

@@ -100,7 +100,7 @@ const ENVIRONMENT_CONFIGS: EnvironmentCorsConfig = {
     allowedOrigins: [
       'https://example.com',
       'https://www.example.com',
-      'https://project-template-nine.vercel.app',
+      'https://ai-development-template-heroui-nextjs-nine.vercel.app',
     ],
     credentials: true,
   },

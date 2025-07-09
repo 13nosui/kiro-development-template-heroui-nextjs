@@ -112,7 +112,7 @@ touch .claude/project-rules.md
 
 ```bash
 # Project Template特化コマンド例
-.claude/commands/project-template/
+.claude/commands/ai-development-template-heroui-nextjs/
 ├── create-post-component.md        # 投稿機能コンポーネント
 ├── setup-firebase-rules.md         # Firebase設定
 ├── optimize-image-pipeline.md      # 画像最適化
