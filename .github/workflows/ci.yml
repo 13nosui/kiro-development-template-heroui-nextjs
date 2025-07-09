@@ -102,6 +102,8 @@ jobs:
           p/owasp-top-ten
           p/javascript
           p/nextjs
+          .semgrep.yml
+        generateSarif: "1"
       env:
         SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
       continue-on-error: false

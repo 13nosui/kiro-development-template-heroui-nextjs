@@ -75,8 +75,15 @@ export async function GET(
       status: 200, 
       headers: securityHeaders 
     });
-  } catch (error) {
-    console.error("Figma API Error:", error);
+  } catch {
+    // セキュアなエラーログ処理
+    security.logger.logSecurityEvent({
+      type: 'XSS_ATTEMPT',
+      input: 'Figma API request failed',
+      ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+      userAgent: request.headers.get('user-agent') || '',
+    });
+    
     return NextResponse.json(
       { error: "Failed to fetch Figma data" },
       { status: 500, headers: securityHeaders }
