@@ -27,15 +27,49 @@ pnpm install
 
 ### 2. 環境変数設定
 
-`.env.local` を作成し、Firebase設定を追加：
+⚠️ **重要**: このプロジェクトにはダミー値が設定された `.env` と `.env.example` ファイルが含まれています。  
+**本番環境にデプロイする前に、必ずすべてのダミー値を実際の認証情報に置き換えてください。**
+
+#### 開発環境のセットアップ
+
+```bash
+# .env.example を .env.local にコピー
+cp .env.example .env.local
+
+# または、既存の .env ファイルを使用
+cp .env .env.local
+```
+
+#### 必要な環境変数の設定
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+# Firebase設定（必須）
+NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789012
+NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890abcdef
+
+# セキュリティ設定（必須）
+ENCRYPTION_KEY=12345678901234567890123456789012
+JWT_SECRET=jwt-secret-key-1234567890123456
+CSRF_SECRET=csrf-secret-key-1234567890123456
+
+# 外部サービス（オプション）
+FIGMA_ACCESS_TOKEN=figd_your-figma-access-token
+OPENAI_API_KEY=sk-your-openai-api-key-1234567890123456789012345678
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/1234567
+```
+
+#### 環境変数の検証
+
+```bash
+# 環境変数の設定を確認
+npm run env:check
+
+# 詳細な検証を実行
+node scripts/validate-env.js
 ```
 
 ### 3. 開発サーバー起動
