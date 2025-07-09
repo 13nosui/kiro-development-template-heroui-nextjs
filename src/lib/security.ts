@@ -1,7 +1,6 @@
 import DOMPurify from 'dompurify';
 import validator from 'validator';
 import crypto from 'crypto';
-import { cookies } from 'next/headers';
 import { ValidationError } from './validation';
 
 // XSS対策関連
@@ -115,22 +114,7 @@ export const sqlInjectionProtection = {
   },
 };
 
-// CSRF保護用の型定義
-interface CSRFValidationResult {
-  isValid: boolean;
-  error?: string | undefined;
-}
-
-interface CSRFTokenOptions {
-  cookieName?: string;
-  httpOnly?: boolean;
-  secure?: boolean;
-  sameSite?: 'strict' | 'lax' | 'none';
-  maxAge?: number;
-  path?: string;
-}
-
-// CSRFトークン生成とバリデーション
+// CSRFトークン生成とバリデーション（基本機能）
 export const csrfProtection = {
   // CSRFトークンの生成
   generateToken: (): string => {
@@ -162,104 +146,6 @@ export const csrfProtection = {
     
     return result === 0;
   },
-};
-
-// Next.js 15のcookies APIを使用したCSRF保護（サーバーサイド専用）
-export const generateCSRFToken = (options: CSRFTokenOptions = {}): string => {
-  // サーバーサイド実行のチェック
-  if (typeof window !== 'undefined') {
-    throw new Error('generateCSRFToken can only be called on the server side');
-  }
-
-  const {
-    cookieName = 'csrf-token',
-    httpOnly = true,
-    secure = process.env.NODE_ENV === 'production',
-    sameSite = 'strict',
-    maxAge = 3600, // 1時間
-    path = '/',
-  } = options;
-
-  // 32バイトのランダムトークンを生成
-  const token = crypto.randomBytes(32).toString('hex');
-
-  try {
-    // Next.js 15のcookies APIを使用してクッキーに設定
-    const cookieStore = cookies();
-    cookieStore.set(cookieName, token, {
-      httpOnly,
-      secure,
-      sameSite,
-      maxAge,
-      path,
-    });
-
-    return token;
-  } catch (error) {
-    throw new Error(`Failed to set CSRF token cookie: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-};
-
-export const validateCSRFToken = (
-  token: string, 
-  options: Pick<CSRFTokenOptions, 'cookieName'> = {}
-): CSRFValidationResult => {
-  // サーバーサイド実行のチェック
-  if (typeof window !== 'undefined') {
-    throw new Error('validateCSRFToken can only be called on the server side');
-  }
-
-  const { cookieName = 'csrf-token' } = options;
-
-  // 入力値の基本検証
-  if (!token || typeof token !== 'string') {
-    return {
-      isValid: false,
-      error: 'CSRF token is required and must be a string',
-    };
-  }
-
-  // トークンの形式検証（64文字の16進数）
-  if (!/^[a-f0-9]{64}$/i.test(token)) {
-    return {
-      isValid: false,
-      error: 'CSRF token format is invalid',
-    };
-  }
-
-  try {
-    // Next.js 15のcookies APIを使用してクッキーから期待値を取得
-    const cookieStore = cookies();
-    const expectedToken = cookieStore.get(cookieName)?.value;
-
-    if (!expectedToken) {
-      return {
-        isValid: false,
-        error: 'CSRF token not found in cookies',
-      };
-    }
-
-    // タイミング攻撃を防ぐための定数時間比較
-    const isValid = csrfProtection.validateToken(token, expectedToken);
-
-    if (!isValid) {
-      // セキュリティイベントをログ出力
-      securityLogger.logSecurityEvent({
-        type: 'CSRF_ATTACK',
-        input: token.substring(0, 10) + '...', // 部分的にログ出力
-      });
-    }
-
-    return {
-      isValid,
-      error: isValid ? undefined : 'CSRF token validation failed',
-    };
-  } catch (error) {
-    return {
-      isValid: false,
-      error: `Failed to validate CSRF token: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    };
-  }
 };
 
 // 入力値の包括的なセキュリティチェック
