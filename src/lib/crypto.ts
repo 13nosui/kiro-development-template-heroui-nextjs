@@ -226,8 +226,8 @@ export function testEncryption(): boolean {
     const decrypted = decrypt(encrypted);
     
     return testData === decrypted;
-  } catch (error) {
-    console.error('Encryption test failed:', error);
+  } catch {
+    // セキュリティ上の理由でエラー詳細はログに出力しない
     return false;
   }
 }

@@ -161,7 +161,7 @@ export class SecureStorage {
         const cookies = document.cookie.split(';');
         for (const cookie of cookies) {
           const eqPos = cookie.indexOf('=');
-          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+          const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
         }
       },
@@ -179,7 +179,7 @@ export class SecureStorage {
         if (!cookie) return null;
         
         const eqPos = cookie.indexOf('=');
-        return eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        return eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
       }
     };
   }
@@ -227,8 +227,8 @@ export class SecureStorage {
       }
       
       return decryptObject<T>(encryptedData);
-    } catch (error) {
-      console.error(`Failed to get secure item: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } catch {
+      // セキュリティ上の理由でエラー詳細はログに出力しない
       return null;
     }
   }
@@ -293,8 +293,8 @@ export class SecureStorage {
       }
       
       return count;
-    } catch (error) {
-      console.error(`Failed to get storage size: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } catch {
+      // セキュリティ上の理由でエラー詳細はログに出力しない
       return 0;
     }
   }
@@ -317,8 +317,8 @@ export class SecureStorage {
       }
       
       return keys;
-    } catch (error) {
-      console.error(`Failed to get storage keys: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } catch {
+      // セキュリティ上の理由でエラー詳細はログに出力しない
       return [];
     }
   }
