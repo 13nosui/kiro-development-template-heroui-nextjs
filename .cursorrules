@@ -1,634 +1,446 @@
-# Cursor開発ガイドライン - Project Template
+# Cursor 開発ガイドライン - Project Template
 
 ## 基本方針
+
 - **段階的実装**: タスクを小さな単位に分割して段階的に実装する
 - **確認ベース**: 各ステップで動作確認を行ってから次に進む
-- **単一責任**: 1つのタスクに集中し、複数機能を同時実装しない
-- **CI/CD優先**: すべての変更は必ずCI/CDパイプラインを通してから提出
+- **単一責任**: 1 つのタスクに集中し、複数機能を同時実装しない
 
-## PR作成・/devコマンド実行時の必須ルール
-- すべての修正は、ビルド・テストが通る状態で、必ず差分が発生するPRとして提出すること。
-- PR作成後は、必須チェック（GitHub Actions等）が完了し、pendingや失敗がないことを確認すること。
+## PR 作成・/dev コマンド実行時の必須ルール
+
+- すべての修正は、ビルド・テストが通る状態で、必ず差分が発生する PR として提出すること。
+- PR 作成後は、必須チェック（GitHub Actions 等）が完了し、pending や失敗がないことを確認すること。
 - コマンドや引数の記法は公式ドキュメントに従うこと。
-- チェックがpendingの場合は、空コミット追加やPR再オープンで再実行を試みること。
+- チェックが pending の場合は、空コミット追加や PR 再オープンで再実行を試みること。
 
-## 🔧 CI/CDエラー対策 - 強化ルール
+## 実装の進め方
 
-### 事前チェック必須項目
-実装前に必ず以下を確認・実行：
+1. **事前確認**: `.claude/project-rules.md` と `.claude/context.md` を必ず参照
+2. **小単位実装**: 1 つの機能につき 1 つのファイルまたはコンポーネントに集中
+3. **段階確認**: 実装前に具体的な手順を 3-5 ステップに分割して提示
+4. **動作確認**: 各段階で「次のステップに進みますか？」と確認を求める
+5. **エラー対応**: エラーが発生した場合は、その箇所のみを修正
 
-```bash
-# 1. 依存関係の確認
-npm ls --depth=0
-npm audit --audit-level=moderate
+## タスク分割の例
 
-# 2. ビルド確認
-npm run build
+### ❌ 悪い例
 
-# 3. テスト実行
-npm test
-npm run test:coverage
+「認証機能を完全に実装してください」
 
-# 4. リンター・フォーマッター
-npm run lint
-npm run format
+### ✅ 良い例
 
-# 5. 型チェック
-npm run type-check
+「認証機能を以下の順序で段階的に実装してください：
+
+1. ログインフォームの UI のみ（バリデーションなし）
+2. フォームバリデーション機能の追加
+3. Firebase Auth 連携の実装
+   各段階で動作確認をしてから次に進んでください。」
+
+## 禁止事項
+
+- 複数ファイルの同時大幅変更
+- 未確認のまま次の機能に進む
+- 全体的なリファクタリングを一度に行う
+- 任意の値（arbitrary values）の使用
+- 標準 Tailwind クラス（text-gray-500 等）の使用
+
+## 推奨する作業単位
+
+- UI コンポーネント 1 つずつ
+- API 機能 1 つずつ
+- バグ修正 1 つずつ
+- テスト追加 1 つずつ
+
+## 確認必須項目
+
+- [ ] TypeScript 型エラーなし
+- [ ] ESLint/Prettier 準拠
+- [ ] カスタムデザイントークンのみ使用
+- [ ] アクセシビリティ対応確認
+- [ ] レスポンシブ対応確認
+
+## コマンド優先順位
+
+1. `.claude/commands/design/figma-to-component.md` - 新規コンポーネント作成
+2. `.claude/commands/design/refactor-safe.md` - 既存コンポーネント改修
+3. `.claude/commands/development/create-feature-complete.md` - 機能実装
+4. `.claude/commands/development/review-comprehensive.md` - 品質確認
+
+## ショートカットコマンド
+
+- **"/step"** = step-by-step-implementation.md に従って段階的実装
+- **"/figma"** = figma-to-component.md に従ってコンポーネント作成
+- **"/refactor"** = refactor-safe.md に従って安全リファクタリング
+- **"/review"** = review-comprehensive.md に従って品質確認
+- **"/feature"** = create-feature-complete.md に従って機能実装
+- **"/test"** = test-all.md に従ってテスト実行
+
+### Git 操作コマンド
+
+- **"/commit"** = 変更をコミット（適切なコミットメッセージ付き）
+- **"/push"** = 現在のブランチをリモートにプッシュ
+- **"/pr"** = プルリクエストを作成（GitHub CLI 使用）
+- **"/deploy"** = deploy-production.md に従って本番デプロイ
+
+### フルワークフローコマンド
+
+- **"/dev"** = 完全開発ワークフロー（ブランチ作成 → 実装 →PR→ マージ）
+- **"/quick"** = 簡易ワークフロー（現在ブランチで実装 → コミット → プッシュ）
+- **"/hotfix"** = 緊急修正ワークフロー（hotfix/ブランチ → 修正 → 即座にマージ）
+
+## 使用例
+
+User: "/step ログイン機能を実装"
+→ step-by-step-implementation.md に従って、ログイン機能を段階的に実装
+
+User: "/figma ボタンコンポーネント"  
+→ figma-to-component.md に従って、ボタンコンポーネントを作成
+
+User: "/commit"
+→ 変更を分析して適切なメッセージでコミット
+
+User: "/commit ログイン機能を追加"  
+→ 指定されたメッセージでコミット
+
+User: "/push"
+→ 現在のブランチをリモートにプッシュ
+
+User: "/pr ログイン機能の実装"
+→ 指定タイトルで PR を作成
+
+User: "/commit && /push && /pr"
+→ コミット → プッシュ →PR 作成を連続実行
+
+## Git 操作の詳細動作
+
+### /commit の動作
+
+1. `git status` で変更を確認
+2. 変更内容を分析して適切なコミットメッセージを生成
+3. `git add .` で全変更をステージング
+4. `git commit -m "生成されたメッセージ"` で実行
+
+### /push の動作
+
+1. 現在のブランチを確認
+2. `git push origin [current-branch]` を実行
+3. プッシュ結果を報告
+
+### /pr の動作
+
+1. 現在のブランチから main への PR を作成
+2. 変更内容を分析して PR 説明文を自動生成
+3. `gh pr create` で GitHub PR を作成
+
+## フルワークフロー詳細
+
+### /dev の動作フロー
+
+1. **ブランチ確認**: `git status` と `git branch` で現在状況確認
+2. **ブランチ作成**: `feature/[機能名]` または `fix/[修正名]` ブランチを作成
+3. **段階的実装**: step-by-step-implementation.md に従って実装
+4. **品質チェック**: review-comprehensive.md に従って確認
+5. **コミット**: 適切なメッセージで変更をコミット
+6. **プッシュ**: リモートブランチにプッシュ
+7. **PR 作成**: main ブランチへのプルリクエスト作成
+8. **マージ確認**: PR 承認後の自動マージ（オプション）
+
+### /quick の動作フロー
+
+1. **現在ブランチで作業**: 新規ブランチ作成をスキップ
+2. **実装**: 段階的実装
+3. **コミット → プッシュ**: 連続実行
+
+### /hotfix の動作フロー
+
+1. **hotfix ブランチ作成**: `hotfix/[修正名]` ブランチ
+2. **緊急修正**: 最小限の修正実装
+3. **即座にマージ**: レビュー省略で main に直接マージ
+
+## ワークフロー制御オプション
+
+### 自動化レベル設定
+
+- **"/dev --auto"** = 全ステップを自動実行（確認なし）
+- **"/dev --step"** = 各ステップで確認を求める（デフォルト）
+- **"/dev --pause"** = 実装完了後に一時停止（手動で PR 作成）
+
+### ブランチ命名規則
+
+- 機能実装: `feature/[機能名]`
+- バグ修正: `fix/[修正内容]`
+- 緊急修正: `hotfix/[修正内容]`
+- リファクタリング: `refactor/[対象]`
+
+### 自動マージ条件
+
+- [ ] 全テストパス
+- [ ] コードレビュー承認（設定による）
+- [ ] Conflict なし
+- [ ] CI/CD パイプライン成功
+
+## コミットメッセージ生成ルール
+
+以下の形式で適切なコミットメッセージを生成：
+
+### 機能追加
+
+- `feat: ログイン機能を追加`
+- `feat(auth): Firebase認証を実装`
+
+### バグ修正
+
+- `fix: ボタンクリック時のエラーを修正`
+- `fix(ui): レスポンシブ表示の問題を解決`
+
+### リファクタリング
+
+- `refactor: HeaderComponentのスタイリングを改善`
+- `refactor(types): 型定義を整理`
+
+### ドキュメント
+
+- `docs: READMEにセットアップ手順を追加`
+- `docs(api): API仕様書を更新`
+
+### その他
+
+- `style: ESLintルールに従ってコードを修正`
+- `test: ログイン機能のテストを追加`
+- `chore: 依存関係を更新`
+
+## デフォルト動作
+
+実装系のタスクを依頼された場合、特に指示がなければ自動的に step-by-step-implementation.md に従って段階的に実装してください。
+
+例：
+
+- 「ログイン機能を作って」→ 自動的に段階的実装
+- 「ボタンコンポーネントを作って」→ 自動的に figma-to-component.md 適用
+
+## 高度な使用例
+
+### フル開発ワークフロー
+
+```
+User: "/dev ログイン機能を実装"
+
+Claude: "🚀 フル開発ワークフローを開始します
+
+Step 1: ブランチ確認
+現在: main ブランチ ✅
+未コミット変更: なし ✅
+
+Step 2: 作業ブランチ作成
+feature/login-implementation を作成します
+
+Step 3: 段階的実装開始
+ログイン機能を以下の手順で実装：
+□ ログインフォームUI作成
+□ バリデーション機能追加
+□ Firebase Auth連携
+□ エラーハンドリング
+
+最初のステップ（フォームUI）から始めますか？"
 ```
 
-### Cursor Web /devコマンドへの指示内容
-Cursor Webが/devコマンドを実行する際に従うべき指示：
+### チーム開発での使用
 
-**必須動作**: 以下を確認なしで順次自動実行し、エラーのないPR作成まで完了する
+```
+User: "/dev --step ユーザー認証機能 --reviewer @team-lead"
+→ ステップ確認付きで実装、PR作成時に@team-leadを自動アサイン
 
-1. **自動環境準備**
-   - 現在の変更を自動退避（git stash）
-   - mainブランチ切替・最新化
-   - feature/[タスク名]-[timestamp]ブランチ自動作成
+User: "/dev --auto 軽微なUIの調整 --no-review"
+→ 確認なしで全自動実行、レビュー不要でマージ
+```
 
-2. **自動品質保証**
-   - npm ci → npm audit fix --force
-   - npm run lint -- --fix
-   - npm run type-check
-   - npm test --passWithNoTests
-   - npm run build
+### 複数機能の並行開発
 
-3. **自動実装実行**
-   - タスクを3-5ステップに自動分割
-   - 各ステップ実装後に品質チェック実行
-   - エラー検出時は自動修正を3回まで試行
+```
+User: "/dev 機能A && /dev 機能B"
+→ 機能Aを完了後、feature/機能B ブランチで機能Bを開始
+```
 
-4. **自動PR作成・マージ**
-   - 適切なコミットメッセージで自動コミット
-   - git push origin [branch-name]
-   - gh pr create（タイトル・説明文自動生成）
-   - GitHub Actions完了まで自動待機
-   - 全チェック通過後に自動マージ（--squash --delete-branch）
-   - mainブランチに自動復帰・最新化
+---
 
-**エラー処理**: いずれかの段階でエラーが発生した場合は自動修正を試行し、3回失敗したら停止
+# 🔧 CI/CD パイプライン エラー対策 - 追加ルール
 
-### CI/CDパイプライン対応コマンド
+## 実装前必須チェック
 
-#### 新規追加コマンド
-- **"/precheck"** = CI/CD実行前の事前チェック
-- **"/fix-ci"** = CI/CDエラーの自動修正
-- **"/build-test"** = ビルドとテストの組み合わせ実行
-- **"/lint-fix"** = リンターエラーの自動修正
-- **"/type-fix"** = TypeScript型エラーの修正
-- **"/audit-fix"** = セキュリティ脆弱性の自動修正
+すべての実装作業開始前に以下を**必ず実行**：
 
-#### 強化されたワークフローコマンド
-- **"/dev-safe"** = 完全なCI/CDチェック付きワークフロー
-- **"/dev-quick"** = 最小限チェック付きワークフロー
-- **"/dev-hotfix"** = 緊急修正用の最適化ワークフロー
-
-### エラー別対応マニュアル
-
-#### 1. ビルドエラー対応
 ```bash
-# TypeScript型エラー
-npm run type-check -- --noEmit
-
-# モジュール解決エラー
-npm run build -- --verbose
-
-# 依存関係エラー
+# 1. 依存関係の確認・修正
 npm ci
-npm run build
-```
-
-#### 2. テストエラー対応
-```bash
-# 単体テスト失敗
-npm test -- --verbose --coverage
-
-# スナップショット更新
-npm test -- --updateSnapshot
-
-# テストファイル修正
-npm test -- --watchAll=false
-```
-
-#### 3. リンターエラー対応
-```bash
-# 自動修正可能なエラー
-npm run lint -- --fix
-
-# 手動修正必要なエラー
-npm run lint -- --format=detailed
-
-# 設定ファイル確認
-npm run lint -- --print-config
-```
-
-#### 4. セキュリティエラー対応
-```bash
-# 脆弱性スキャン
-npm audit
-
-# 自動修正
 npm audit fix
 
-# 強制更新（慎重に）
-npm audit fix --force
+# 2. 既存コードの品質確認
+npm run lint
+npm run type-check
+npm test
+
+# 3. ビルド確認
+npm run build
 ```
 
-## 📋 実装チェックリスト
+## 各段階での品質チェック
 
-### PR作成前必須チェック
+### 実装中のチェック（各ステップ後）
+
+- [ ] TypeScript コンパイルエラーなし
+- [ ] ESLint エラー・警告なし
+- [ ] 未使用 import の削除
+- [ ] console.log の削除
+
+### コミット前必須チェック
+
 - [ ] `npm run build` 成功
 - [ ] `npm test` 全テスト通過
 - [ ] `npm run lint` エラーゼロ
 - [ ] `npm run type-check` 型エラーゼロ
 - [ ] `npm audit` 重要な脆弱性なし
-- [ ] 環境変数設定確認
-- [ ] README.md更新（必要に応じて）
-- [ ] CHANGELOG.md更新（必要に応じて）
 
-### コード品質チェック
-- [ ] 未使用import削除
-- [ ] console.log削除
-- [ ] TODOコメント整理
-- [ ] 適切なエラーハンドリング
-- [ ] 型定義の完全性
-- [ ] アクセシビリティ対応
-- [ ] レスポンシブデザイン確認
-- [ ] パフォーマンス最適化
+## エラー時の対処法
 
-### テスト要件
-- [ ] 新機能のテストケース作成
-- [ ] エッジケースのテスト
-- [ ] エラーケースのテスト
-- [ ] 統合テストの更新
-- [ ] テストカバレッジ90%以上
+### ビルドエラーが発生した場合
 
-## 🚀 強化されたワークフロー
-
-### /dev-safe の詳細動作
 ```bash
-# 1. 環境確認
-git status
-node --version
-npm --version
+# 1. 詳細なエラー情報を確認
+npm run build -- --verbose
 
-# 2. 依存関係確認
+# 2. TypeScript型エラーの場合
+npm run type-check -- --noEmit
+
+# 3. 依存関係の問題の場合
 npm ci
+npm run build
+```
+
+### テストエラーが発生した場合
+
+```bash
+# 1. 詳細なテスト結果を確認
+npm test -- --verbose
+
+# 2. スナップショット更新が必要な場合
+npm test -- --updateSnapshot
+
+# 3. 特定のテストファイルのみ実行
+npm test -- --testPathPattern=[ファイル名]
+```
+
+### リンターエラーが発生した場合
+
+```bash
+# 1. 自動修正可能なエラーを修正
+npm run lint -- --fix
+
+# 2. 手動修正が必要なエラーを確認
+npm run lint -- --format=detailed
+```
+
+### セキュリティ脆弱性が発生した場合
+
+```bash
+# 1. 脆弱性の詳細を確認
 npm audit
 
-# 3. 事前テスト
-npm run lint
-npm run type-check
-npm test
-
-# 4. ビルド確認
-npm run build
-
-# 5. ブランチ作成
-git checkout -b feature/[機能名]
-
-# 6. 段階的実装
-# step-by-step-implementation.mdに従って実装
-
-# 7. 各段階でのテスト
-npm run build && npm test
-
-# 8. 最終チェック
-npm run lint -- --fix
-npm run type-check
-npm test -- --coverage
-npm run build
-
-# 9. コミット
-git add .
-git commit -m "適切なコミットメッセージ"
-
-# 10. プッシュ
-git push origin feature/[機能名]
-
-# 11. PR作成
-gh pr create --title "..." --body "..."
-
-# 12. CI/CD待機
-# GitHub Actionsの完了を待つ
-```
-
-### /precheck の動作
-```bash
-echo "🔍 CI/CD事前チェック開始..."
-
-# Node.js環境確認
-node --version
-npm --version
-
-# パッケージ整合性確認
-npm ls --depth=0
-
-# 脆弱性チェック
-npm audit --audit-level=moderate
-
-# 型チェック
-npm run type-check
-
-# リンター実行
-npm run lint
-
-# テスト実行
-npm test
-
-# ビルド確認
-npm run build
-
-echo "✅ 事前チェック完了"
-```
-
-### /fix-ci の動作
-```bash
-echo "🔧 CI/CDエラー自動修正開始..."
-
-# 依存関係修正
-npm ci
-
-# リンターエラー修正
-npm run lint -- --fix
-
-# 型エラー確認
-npm run type-check --noEmit
-
-# 脆弱性修正
+# 2. 自動修正を試行
 npm audit fix
 
-# テスト実行
-npm test
-
-# ビルド確認
-npm run build
-
-echo "✅ CI/CDエラー修正完了"
+# 3. 強制更新（注意して実行）
+npm audit fix --force
 ```
 
-## 🎯 個人開発特化設定
+## 禁止事項（CI/CD 対策）
 
-### 自動化レベル設定
-```bash
-# 完全自動化（推奨）
-/dev-safe --auto
+以下は CI/CD パイプラインでエラーの原因となるため**絶対に行わない**：
 
-# 段階確認付き
-/dev-safe --step
+- [ ] TypeScript エラーがある状態でのコミット
+- [ ] テストが失敗する状態でのコミット
+- [ ] ESLint エラーがある状態でのコミット
+- [ ] ビルドが失敗する状態でのコミット
+- [ ] 重要な脆弱性があるパッケージの使用
+- [ ] 環境変数の設定忘れ
+- [ ] package.json と package-lock.json の不整合
 
-# 最小限チェック
-/dev-quick --minimal
-```
+## 推奨ワークフロー（CI/CD 対応版）
 
-### ブランチ戦略（個人開発）
-- **main**: 本番環境
-- **develop**: 開発環境（省略可能）
-- **feature/***: 機能開発
-- **hotfix/***: 緊急修正
+### 実装開始前
 
-### 自動マージ条件（個人開発）
-- [ ] 全テストパス
-- [ ] ビルド成功
-- [ ] リンターエラーゼロ
-- [ ] 型エラーゼロ
-- [ ] 脆弱性なし
+1. 最新の main ブランチに切り替え
+2. `git pull origin main` で最新化
+3. 事前品質チェック実行
+4. 新しいブランチを作成
 
-## 📊 品質指標
+### 実装中
 
-### 必須指標
-- **テストカバレッジ**: 90%以上
-- **ビルドサイズ**: 3MB以下
-- **ロード時間**: 2秒以下
-- **Lighthouse Score**: 90点以上
-- **脆弱性**: 0件
+1. 小さな単位で実装
+2. **各ステップ後に必ずビルド・テスト実行**
+3. エラーが発生したら即座に修正
+4. 段階的にコミット
 
-### 監視項目
-- Bundle size変更
-- 依存関係更新
-- パフォーマンス指標
-- エラー発生率
+### 実装完了後
 
-## 🔄 継続的改善
+1. 最終品質チェック実行
+2. すべてのチェックが通過することを確認
+3. 適切なコミットメッセージでコミット
+4. プッシュ後、PR 作成
 
-### 週次レビュー
-- [ ] 依存関係更新
-- [ ] 脆弱性スキャン
-- [ ] パフォーマンス測定
-- [ ] コード品質確認
+## トラブルシューティング
 
-### 月次レビュー
-- [ ] アーキテクチャ見直し
-- [ ] テスト戦略見直し
-- [ ] CI/CD最適化
-- [ ] ドキュメント更新
+### よくあるエラーパターンと対処法
 
-## 🚨 エラー対応フローチャート
+1. **"Module not found" エラー**
 
-```
-エラー発生
-    ↓
-ビルドエラー? → Yes → 型チェック → 修正 → 再ビルド
-    ↓ No
-テストエラー? → Yes → テスト詳細確認 → 修正 → 再テスト
-    ↓ No
-リンターエラー? → Yes → 自動修正実行 → 手動修正 → 再実行
-    ↓ No
-依存関係エラー? → Yes → npm ci → npm audit → 修正
-    ↓ No
-その他 → ログ確認 → 個別対応
-```
-
-## 💡 トラブルシューティング
-
-### よくあるエラーと対処法
-
-1. **"Module not found"**
    ```bash
-   npm ci
-   npm run build
+   # 解決方法
+   rm -rf node_modules package-lock.json
+   npm install
    ```
 
-2. **"Type error"**
+2. **"Type '...' is not assignable to type '...'" エラー**
+
    ```bash
+   # 解決方法
    npm run type-check -- --noEmit
-   # 型定義修正後
-   npm run build
+   # 型定義を修正後、再度確認
    ```
 
-3. **"Test failed"**
+3. **"Expected 0 arguments, but got 1" エラー**
+
    ```bash
-   npm test -- --verbose
-   # テスト修正後
+   # 解決方法
+   # 関数の引数定義を確認・修正
+   # TypeScript型定義を更新
+   ```
+
+4. **"Unexpected token" エラー**
+
+   ```bash
+   # 解決方法
+   npm run lint -- --fix
+   # 構文エラーを手動修正
+   ```
+
+5. **"Test suite failed to run" エラー**
+   ```bash
+   # 解決方法
+   npm test -- --clearCache
    npm test
    ```
 
-4. **"Build failed"**
-   ```bash
-   npm run build -- --verbose
-   # エラー箇所修正後
-   npm run build
-   ```
+## 品質指標の目安
 
-5. **"Audit vulnerabilities"**
-   ```bash
-   npm audit fix
-   # 手動修正が必要な場合
-   npm audit fix --force
-   ```
+以下の指標を満たすことを推奨（現実的な範囲で）：
 
-## 実装の進め方（強化版）
-1. **事前確認**: `/precheck` コマンドでCI/CD事前チェック
-2. **環境準備**: 依存関係とビルド環境の確認
-3. **小単位実装**: 1つの機能につき1つのファイルまたはコンポーネントに集中
-4. **段階確認**: 各段階でビルド・テスト・リンターを実行
-5. **品質確認**: コードレビューとテストカバレッジ確認
-6. **CI/CD確認**: GitHub Actionsの完了を待機
-
-## 禁止事項（強化版）
-- CI/CDチェックをスキップする
-- テストを書かずに実装する
-- 型エラーを無視する
-- リンターエラーを無視する
-- 脆弱性のあるパッケージを使用する
-- ビルドが失敗する状態でコミットする
-- 複数ファイルの同時大幅変更
-- 未確認のまま次の機能に進む
-- 全体的なリファクタリングを一度に行う
-
-## 🤖 完全自動化 /devコマンド設定
-
-### Cursor Web /devコマンドの完全自動化動作
-`/dev [タスク内容]` 実行時は以下を**確認なしで全自動実行**：
-
-```bash
-# ===== PHASE 1: 環境準備 =====
-echo "🚀 /dev完全自動化開始: [タスク内容]"
-
-# 1-1. 現在状態確認
-git status --porcelain
-git branch --show-current
-
-# 1-2. 未コミット変更がある場合は自動退避
-if [ -n "$(git status --porcelain)" ]; then
-  git stash push -m "auto-stash-before-dev-$(date +%s)"
-fi
-
-# 1-3. mainブランチに切り替え＆最新化
-git checkout main
-git pull origin main
-
-# ===== PHASE 2: 事前品質チェック =====
-# 2-1. 依存関係確認＆修正
-npm ci
-npm audit fix --force
-
-# 2-2. 既存コードの品質確認
-npm run lint -- --fix
-npm run type-check
-npm test --passWithNoTests
-
-# 2-3. ビルド確認
-npm run build
-
-# ===== PHASE 3: 作業ブランチ作成 =====
-# 3-1. ブランチ名自動生成
-BRANCH_NAME="feature/$(echo '[タスク内容]' | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]')-$(date +%s)"
-git checkout -b $BRANCH_NAME
-
-# ===== PHASE 4: 実装実行 =====
-# 4-1. タスクを3-5個のステップに自動分割
-# 4-2. 各ステップを順次実装
-# 4-3. 各ステップ後に自動品質チェック実行
-
-# ===== PHASE 5: 品質保証ループ =====
-# 5-1. 実装後の品質チェック
-npm run lint -- --fix
-npm run type-check --noEmit
-npm test --coverage --watchAll=false
-
-# 5-2. エラーがある場合は自動修正試行
-while ! npm run build > /dev/null 2>&1; do
-  echo "🔧 ビルドエラー検出 - 自動修正中..."
-  # TypeScriptエラー自動修正
-  npm run type-check -- --noEmit --pretty
-  # 一般的なエラーパターンの修正実行
-  npm run lint -- --fix
-  
-  # 3回試行して失敗したら中断
-  RETRY_COUNT=$((RETRY_COUNT + 1))
-  if [ $RETRY_COUNT -gt 3 ]; then
-    echo "❌ 自動修正に失敗しました"
-    exit 1
-  fi
-done
-
-# ===== PHASE 6: 最終検証 =====
-echo "✅ 最終検証実行中..."
-npm run lint
-npm run type-check
-npm test --coverage --watchAll=false
-npm run build
-npm audit --audit-level=moderate
-
-# ===== PHASE 7: コミット＆プッシュ =====
-# 7-1. 変更内容を解析して適切なコミットメッセージ生成
-COMMIT_MSG="feat: [タスク内容の要約]
-
-- [実装した機能1]
-- [実装した機能2]
-- [修正した問題]
-
-Automated PR via /dev command"
-
-# 7-2. 全変更をコミット
-git add .
-git commit -m "$COMMIT_MSG"
-
-# 7-3. リモートにプッシュ
-git push origin $BRANCH_NAME
-
-# ===== PHASE 8: PR自動作成 =====
-# 8-1. PR説明文自動生成
-PR_BODY="## 概要
-[タスク内容]を実装しました。
-
-## 実装内容
-- [具体的な実装内容]
-- [変更したファイル]
-- [追加したテスト]
-
-## テスト結果
-- ✅ ビルド成功
-- ✅ 全テスト通過
-- ✅ リンターエラーなし
-- ✅ 型チェック通過
-- ✅ 脆弱性なし
-
-## 確認事項
-- [ ] 機能動作確認
-- [ ] レスポンシブ確認
-- [ ] アクセシビリティ確認
-
-Automated PR created by Cursor /dev command
-$(date)"
-
-# 8-2. GitHub PR作成
-gh pr create \
-  --title "feat: [タスク内容]" \
-  --body "$PR_BODY" \
-  --base main \
-  --head $BRANCH_NAME \
-  --assignee @me
-
-# ===== PHASE 9: CI/CD監視＆自動マージ =====
-echo "🔄 CI/CDパイプライン監視中..."
-
-# 9-1. GitHub Actions完了まで待機
-PR_NUMBER=$(gh pr view --json number --jq .number)
-while true; do
-  STATUS=$(gh pr view $PR_NUMBER --json statusCheckRollup --jq '.statusCheckRollup[].state' | sort | uniq)
-  
-  if echo "$STATUS" | grep -q "FAILURE\|ERROR"; then
-    echo "❌ CI/CDパイプラインでエラーが発生しました"
-    echo "PR URL: $(gh pr view $PR_NUMBER --json url --jq .url)"
-    exit 1
-  elif [ "$STATUS" = "SUCCESS" ]; then
-    echo "✅ 全てのCI/CDチェックが成功しました"
-    break
-  else
-    echo "⏳ CI/CDパイプライン実行中... (30秒後に再確認)"
-    sleep 30
-  fi
-done
-
-# 9-2. 自動マージ実行
-gh pr merge $PR_NUMBER --squash --delete-branch
-
-# ===== PHASE 10: 完了処理 =====
-# 10-1. mainブランチに戻る
-git checkout main
-git pull origin main
-
-# 10-2. 完了報告
-echo "🎉 /dev完全自動化完了!"
-echo "📝 実装内容: [タスク内容]"
-echo "🔗 PR: $(gh pr view $PR_NUMBER --json url --jq .url)"
-echo "✅ 自動マージ完了"
-echo "🚀 mainブランチが最新状態に更新されました"
-```
-
-### 自動化レベル設定
-```bash
-# デフォルト: 完全自動化（推奨）
-/dev "ログイン機能を実装"
-
-# 確認ステップあり（デバッグ用）
-/dev --confirm "ログイン機能を実装"
-
-# 手動マージ（PR作成まで自動）
-/dev --no-merge "ログイン機能を実装"
-```
-
-### エラー時の自動復旧機能
-```bash
-# ビルドエラー自動修正
-auto_fix_build_errors() {
-  echo "🔧 ビルドエラー自動修正中..."
-  
-  # TypeScript型エラー修正
-  npm run type-check -- --noEmit | grep "error TS" | while read error; do
-    # 一般的な型エラーパターンの自動修正
-    echo "修正中: $error"
-  done
-  
-  # 未使用import削除
-  npm run lint -- --fix
-  
-  # 再ビルド試行
-  npm run build
-}
-
-# テストエラー自動修正
-auto_fix_test_errors() {
-  echo "🔧 テストエラー自動修正中..."
-  
-  # スナップショット更新
-  npm test -- --updateSnapshot --watchAll=false
-  
-  # 再テスト実行
-  npm test --watchAll=false
-}
-
-# 依存関係エラー自動修正
-auto_fix_dependency_errors() {
-  echo "🔧 依存関係エラー自動修正中..."
-  
-  # 強制再インストール
-  rm -rf node_modules package-lock.json
-  npm install
-  
-  # 脆弱性修正
-  npm audit fix --force
-}
-```
-
-## デフォルト動作（完全自動化版）
-**すべての実装系タスクは/devコマンドで完全自動化**：
-
-1. **環境準備**: 自動でmainブランチ最新化、作業ブランチ作成
-2. **実装**: タスクを自動分割して段階的実装
-3. **品質保証**: エラー検出時の自動修正試行
-4. **PR作成**: 適切なタイトル・説明文で自動PR作成
-5. **CI/CD監視**: GitHub Actions完了まで自動待機
-6. **自動マージ**: 全チェック通過後に自動でmainにマージ
-7. **後処理**: mainブランチに戻って最新状態に更新
-
-例：
-- 「ログイン機能を作って」→ 完全自動でPR作成・マージまで実行
-- 「バグを修正して」→ 自動で修正・テスト・マージまで実行
-- 「UIを改善して」→ 自動で実装・品質チェック・マージまで実行
+- **ビルド成功率**: 100%（必須）
+- **TypeScript エラー**: 0 件（必須）
+- **ESLint エラー**: 0 件（必須）
+- **テスト成功率**: 100%（必須）
+- **セキュリティ脆弱性**: 重要度 High 以上は 0 件（必須）
+- **ビルド時間**: プロジェクト規模に応じて適切な範囲
+- **テストカバレッジ**: 既存テストが通ること（新規テスト追加は推奨）
 
 ---
-*この強化版ルールにより、CI/CDパイプラインでのエラーを大幅に削減し、個人開発でも enterprise-grade な品質を維持できます。*
+
