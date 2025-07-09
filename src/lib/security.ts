@@ -114,7 +114,7 @@ export const sqlInjectionProtection = {
   },
 };
 
-// CSRFトークン生成とバリデーション
+// CSRFトークン生成とバリデーション（基本機能）
 export const csrfProtection = {
   // CSRFトークンの生成
   generateToken: (): string => {
