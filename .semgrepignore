@@ -1,0 +1,29 @@
+# Semgrep ignore file
+# テスト関連ファイル
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/*.stories.ts
+**/*.stories.tsx
+
+# ビルド成果物
+dist/
+build/
+.next/
+out/
+
+# 依存関係
+node_modules/
+
+# ドキュメントファイル
+*.md
+docs/
+
+# 設定ファイル（検証済み）
+*.config.js
+*.config.ts
+
+# 外部ライブラリの型定義
+types/
+@types/

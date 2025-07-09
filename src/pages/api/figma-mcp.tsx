@@ -41,10 +41,16 @@ export default async function handler(
     const { fileId, nodeId } = req.query;
     const token = process.env.FIGMA_PERSONAL_ACCESS_TOKEN;
     
-    if (!fileId || !nodeId || !token) {
+    if (!fileId || !nodeId) {
       return res
         .status(400)
-        .json({ error: "Missing fileId, nodeId, or token" });
+        .json({ error: "Missing fileId or nodeId parameters" });
+    }
+    
+    if (!token) {
+      return res
+        .status(500)
+        .json({ error: "Figma personal access token not configured" });
     }
 
     // パラメータのバリデーション

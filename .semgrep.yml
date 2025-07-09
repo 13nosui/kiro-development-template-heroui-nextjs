@@ -1,0 +1,62 @@
+rules:
+  - id: no-console-error-in-production
+    pattern: console.error(...)
+    message: |
+      console.error() should not be used in production code. 
+      Use secure logging mechanism instead.
+    languages: [typescript, javascript]
+    severity: WARNING
+    paths:
+      include:
+        - "src/**/*.ts"
+        - "src/**/*.tsx"
+      exclude:
+        - "**/*.test.*"
+        - "**/*.stories.*"
+        - "**/*.dev.*"
+
+  - id: secure-env-var-check
+    pattern-either:
+      - pattern: process.env.$VAR
+    message: |
+      Environment variable access detected. Ensure proper validation 
+      and error handling for undefined values.
+    languages: [typescript, javascript]
+    severity: INFO
+    paths:
+      include:
+        - "src/**/*.ts"
+        - "src/**/*.tsx"
+    
+  - id: api-token-in-client-code
+    pattern-either:
+      - pattern: |
+          process.env.FIGMA_ACCESS_TOKEN
+      - pattern: |
+          process.env.FIGMA_PERSONAL_ACCESS_TOKEN
+    message: |
+      API tokens should only be used in server-side code. 
+      Ensure this code runs on the server.
+    languages: [typescript, javascript]
+    severity: ERROR
+    paths:
+      include:
+        - "src/**/*.ts"
+        - "src/**/*.tsx"
+      exclude:
+        - "src/pages/api/**"
+        - "src/app/api/**"
+
+  - id: localStorage-security-check
+    pattern-either:
+      - pattern: localStorage.setItem($KEY, $VALUE)
+      - pattern: sessionStorage.setItem($KEY, $VALUE)
+    message: |
+      Storing sensitive data in localStorage/sessionStorage can be risky.
+      Ensure data is properly encrypted and validated.
+    languages: [typescript, javascript]
+    severity: WARNING
+    paths:
+      include:
+        - "src/**/*.ts"
+        - "src/**/*.tsx"
