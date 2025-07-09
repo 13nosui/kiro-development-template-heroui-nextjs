@@ -1,0 +1,83 @@
+# CodeQL分析設定
+name: "Security Analysis Configuration"
+disable-default-queries: false
+
+# 実行するクエリスイートの設定
+queries:
+  # セキュリティ関連のクエリを優先
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+
+# パス設定
+paths:
+  # 分析対象のパス
+  - src/**
+  - pages/**
+  - app/**
+  - components/**
+  - lib/**
+  - utils/**
+  - hooks/**
+
+# 除外するパス
+paths-ignore:
+  - node_modules/**
+  - .next/**
+  - dist/**
+  - build/**
+  - coverage/**
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/*.stories.*"
+  - "**/*.config.*"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/__tests__/**"
+  - "**/storybook-static/**"
+
+# 追加のパック（将来の拡張用）
+packs:
+  # Node.js セキュリティパック
+  - codeql/javascript-queries
+  # React セキュリティパック
+  - codeql/javascript-queries:Security
+  # TypeScript セキュリティパック  
+  - codeql/javascript-queries:security-extended
+
+# カスタムクエリの設定（プロジェクト固有）
+query-filters:
+  - include:
+      kind: problem
+      tags:
+        - security
+        - external/cwe
+  - include:
+      kind: path-problem
+      tags:
+        - security
+  # 重要度の高いセキュリティ問題のみ
+  - include:
+      severity: 
+        - error
+        - warning
+  # 情報レベルの問題は除外（ノイズ削減）
+  - exclude:
+      severity: note
+
+# 言語固有の設定
+languages:
+  javascript:
+    # JavaScript固有のセキュリティパターン
+    extractor:
+      # ECMAScript 2022以降の構文をサポート
+      typescript: true
+      jsx: true
+      
+  typescript:
+    # TypeScript固有の設定
+    extractor:
+      # 型安全性のチェック
+      strict: true
+      jsx: true
