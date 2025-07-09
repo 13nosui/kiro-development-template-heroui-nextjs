@@ -33,7 +33,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       } else {
         setError(result.error || "認証に失敗しました");
       }
-    } catch (err) {
+    } catch {
       setError("認証に失敗しました");
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       } else {
         setError(result.error || "Google認証に失敗しました");
       }
-    } catch (err) {
+    } catch {
       setError("Google認証に失敗しました");
     } finally {
       setLoading(false);
