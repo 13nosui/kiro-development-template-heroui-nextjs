@@ -65,7 +65,7 @@
     "react-dom": "^19.1.0",
     "storybook": "^8.6.14",
     "validator": "^13.15.15",
-    "zod": "^3.25.76"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
