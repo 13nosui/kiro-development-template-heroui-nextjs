@@ -6,6 +6,8 @@ import { Input } from "@heroui/react";
 import { Card, CardBody, CardHeader } from "@heroui/react";
 import { Divider } from "@heroui/react";
 import { registerWithEmail, loginWithEmail, signInWithGoogle } from "../lib/firebase";
+import { validators, ValidationError } from "../lib/validation";
+import { security } from "../lib/security";
 
 interface AuthFormProps {
   onSuccess?: () => void;
@@ -15,18 +17,55 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setValidationErrors([]);
+
+    // 入力値のバリデーション
+    const formData = isLogin 
+      ? { email, password }
+      : { email, password, confirmPassword };
+
+    const validationResult = isLogin 
+      ? validators.loginForm(formData)
+      : validators.registerForm(formData);
+
+    if (!validationResult.success) {
+      setValidationErrors(validationResult.errors || []);
+      setLoading(false);
+      return;
+    }
+
+    // セキュリティチェック
+    const emailCheck = security.api.validateAndSanitize(email);
+    const passwordCheck = security.api.validateAndSanitize(password);
+
+    if (!emailCheck.isValid || !passwordCheck.isValid) {
+      security.logger.logSecurityEvent({
+        type: 'XSS_ATTEMPT',
+        input: `email: ${email}`,
+        userAgent: navigator.userAgent,
+      });
+      
+      setError("入力値にセキュリティ上の問題があります");
+      setLoading(false);
+      return;
+    }
+
+    const sanitizedEmail = emailCheck.sanitized!;
+    const sanitizedPassword = passwordCheck.sanitized!;
 
     try {
       const result = isLogin 
-        ? await loginWithEmail(email, password)
-        : await registerWithEmail(email, password);
+        ? await loginWithEmail(sanitizedEmail, sanitizedPassword)
+        : await registerWithEmail(sanitizedEmail, sanitizedPassword);
 
       if (result.success) {
         onSuccess?.();
@@ -43,6 +82,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const handleGoogleAuth = async () => {
     setLoading(true);
     setError("");
+    setValidationErrors([]);
 
     try {
       const result = await signInWithGoogle();
@@ -56,6 +96,12 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // バリデーションエラーの表示用ヘルパー
+  const getFieldError = (fieldName: string): string | undefined => {
+    const error = validationErrors.find(err => err.field === fieldName);
+    return error?.message;
   };
 
   return (
@@ -74,9 +120,11 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             type="email"
             label="メールアドレス"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(security.xss.filterXSS(e.target.value))}
             required
             disabled={loading}
+            isInvalid={!!getFieldError('email')}
+            errorMessage={getFieldError('email')}
           />
           <Input
             type="password"
@@ -85,8 +133,24 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={loading}
-            minLength={6}
+            minLength={8}
+            isInvalid={!!getFieldError('password')}
+            errorMessage={getFieldError('password')}
           />
+          
+          {!isLogin && (
+            <Input
+              type="password"
+              label="パスワード確認"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+              minLength={8}
+              isInvalid={!!getFieldError('confirmPassword')}
+              errorMessage={getFieldError('confirmPassword')}
+            />
+          )}
           
           {error && (
             <p className="text-sm text-red-600">{error}</p>
