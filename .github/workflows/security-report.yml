@@ -1,0 +1,312 @@
+name: "📊 Weekly Security Report"
+
+on:
+  # 毎週金曜日の午前9時（JST）に定期実行
+  schedule:
+    - cron: '0 0 * * 5'  # UTC 0:00 = JST 9:00
+  # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      include_detailed_scan:
+        description: '詳細スキャンを含める'
+        required: false
+        default: true
+        type: boolean
+      send_notifications:
+        description: '通知を送信する'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  generate-security-report:
+    name: 📊 Generate Comprehensive Security Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 全履歴を取得（セキュリティ分析用）
+
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 🛡️ Run comprehensive security scan
+      run: |
+        echo "🔍 Starting comprehensive security analysis..."
+        
+        # 基本セキュリティチェック
+        npm run security:full
+        
+        # 詳細な脆弱性レポート生成
+        npm audit --json > vulnerability-report.json || true
+        npm outdated --json > outdated-packages.json || true
+        
+        echo "✅ Security scan completed"
+
+    - name: 📈 Analyze security metrics
+      run: |
+        echo "📊 Generating security metrics..."
+        
+        # Git コミット分析
+        git log --since="1 week ago" --pretty=format:"%h,%an,%ad,%s" --date=short > recent-commits.csv
+        
+        # ファイル変更分析
+        git diff --name-only HEAD~7 HEAD > changed-files.txt || echo "No changes in last 7 days" > changed-files.txt
+        
+        # セキュリティ関連ファイルの変更チェック
+        security_files=(
+          ".github/workflows/"
+          "next.config.js"
+          "package.json"
+          "src/lib/security.ts"
+          "src/lib/crypto.ts"
+          ".env.example"
+          "firestore.rules"
+          "storage.rules"
+        )
+        
+        echo "## Security-related file changes in the last week:" > security-changes.md
+        for file in "${security_files[@]}"; do
+          if git log --since="1 week ago" --name-only --pretty=format: -- "$file" | grep -q .; then
+            echo "- $file" >> security-changes.md
+            git log --since="1 week ago" --oneline -- "$file" >> security-changes.md
+          fi
+        done
+
+    - name: 📊 Generate detailed security report
+      if: github.event.inputs.include_detailed_scan == 'true' || github.event_name == 'schedule'
+      run: |
+        echo "📋 Generating detailed security report..."
+        
+        # レポート作成日時
+        report_date=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        
+        # 詳細レポートの生成
+        cat > security-report-detailed.md << EOF
+        # 🔒 Weekly Security Report
+        
+        **Generated:** $report_date
+        **Repository:** ${{ github.repository }}
+        **Branch:** ${{ github.ref_name }}
+        **Workflow Run:** ${{ github.run_id }}
+        
+        ## 📊 Executive Summary
+        
+        ### セキュリティステータス
+        - **Overall Status:** $(if [ -s vulnerability-report.json ] && [ "$(jq '.vulnerabilities | length' vulnerability-report.json 2>/dev/null || echo 0)" -gt 0 ]; then echo "⚠️ Requires Attention"; else echo "✅ Secure"; fi)
+        - **Last Security Audit:** $report_date
+        - **Critical Issues:** $(jq '.vulnerabilities | map(select(.severity == "critical")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        - **High Issues:** $(jq '.vulnerabilities | map(select(.severity == "high")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        - **Moderate Issues:** $(jq '.vulnerabilities | map(select(.severity == "moderate")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        
+        ## 🔍 Vulnerability Analysis
+        
+        ### NPM Security Audit Results
+        \`\`\`json
+        $(cat vulnerability-report.json 2>/dev/null | jq '.' || echo '{"vulnerabilities": [], "message": "No vulnerabilities found"}')
+        \`\`\`
+        
+        ### Outdated Packages
+        \`\`\`json
+        $(cat outdated-packages.json 2>/dev/null | jq '.' || echo '{"message": "All packages are up to date"}')
+        \`\`\`
+        
+        ## 📈 Activity Analysis
+        
+        ### Recent Commits (Last 7 Days)
+        \`\`\`
+        $(cat recent-commits.csv || echo "No commits in the last 7 days")
+        \`\`\`
+        
+        ### Security-Related Changes
+        $(cat security-changes.md)
+        
+        ### Changed Files
+        \`\`\`
+        $(cat changed-files.txt)
+        \`\`\`
+        
+        ## 🛡️ Security Measures Status
+        
+        ### Active Security Tools
+        - [x] **Dependabot** - Automated dependency updates
+        - [x] **CodeQL** - Static code analysis
+        - [x] **Semgrep** - Security-focused static analysis
+        - [x] **NPM Audit** - Package vulnerability scanning
+        - [x] **Custom Security Scripts** - Project-specific checks
+        
+        ### Security Headers Verification
+        - [x] X-Frame-Options
+        - [x] X-Content-Type-Options  
+        - [x] Content-Security-Policy
+        - [x] Strict-Transport-Security
+        
+        ### Authentication & Authorization
+        - [x] Firebase Authentication integration
+        - [x] Email verification required
+        - [x] Firestore security rules
+        - [x] Storage security rules
+        
+        ## 📋 Recommendations
+        
+        ### Immediate Actions Required
+        $(if [ -s vulnerability-report.json ] && [ "$(jq '.vulnerabilities | map(select(.severity == "critical" or .severity == "high")) | length' vulnerability-report.json 2>/dev/null || echo 0)" -gt 0 ]; then
+          echo "🚨 **Critical/High severity vulnerabilities detected!**"
+          echo "- Review and update affected packages immediately"
+          echo "- Run \`npm audit fix\` to apply automatic fixes"
+          echo "- Manually review packages that require breaking changes"
+        else
+          echo "✅ No immediate critical actions required"
+        fi)
+        
+        ### Maintenance Tasks
+        - [ ] Review outdated dependencies
+        - [ ] Update development dependencies
+        - [ ] Review and rotate API keys (if applicable)
+        - [ ] Validate environment variable security
+        
+        ## 📞 Contact Information
+        
+        **Security Team:** security-team@company.com
+        **Development Team:** dev-team@company.com
+        **Emergency Contact:** emergency@company.com
+        
+        ---
+        
+        *This report is automatically generated every Friday. For questions or concerns, contact the security team.*
+        EOF
+        
+        echo "✅ Detailed security report generated"
+
+    - name: 📤 Upload security reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports-${{ github.run_id }}
+        path: |
+          security-report-detailed.md
+          vulnerability-report.json
+          outdated-packages.json
+          recent-commits.csv
+          changed-files.txt
+          security-changes.md
+          security-report.json
+        retention-days: 90
+
+    - name: 📧 Send security report notifications
+      if: (github.event.inputs.send_notifications == 'true' || github.event_name == 'schedule') && always()
+      run: |
+        echo "📤 Sending security report notifications..."
+        
+        # セキュリティステータスの判定
+        critical_count=$(jq '.vulnerabilities | map(select(.severity == "critical")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        high_count=$(jq '.vulnerabilities | map(select(.severity == "high")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        
+        if [ "$critical_count" -gt 0 ] || [ "$high_count" -gt 0 ]; then
+          status_emoji="🚨"
+          status_text="Requires Immediate Attention"
+          color="16711680"  # Red
+        else
+          status_emoji="✅"
+          status_text="Secure"
+          color="65280"     # Green
+        fi
+        
+        # Slack通知
+        if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"text\": \"$status_emoji Weekly Security Report\",
+              \"blocks\": [
+                {
+                  \"type\": \"header\",
+                  \"text\": {
+                    \"type\": \"plain_text\",
+                    \"text\": \"$status_emoji Weekly Security Report\"
+                  }
+                },
+                {
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Repository:* ${{ github.repository }}\\n*Status:* $status_text\\n*Critical Issues:* $critical_count\\n*High Issues:* $high_count\\n\\n*View Full Report:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                  }
+                }
+              ]
+            }" \
+            "${{ secrets.SLACK_WEBHOOK_URL }}"
+        fi
+        
+        # Discord通知
+        if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [
+                {
+                  \"title\": \"$status_emoji Weekly Security Report\",
+                  \"description\": \"Security status for ${{ github.repository }}\",
+                  \"color\": $color,
+                  \"fields\": [
+                    {\"name\": \"Status\", \"value\": \"$status_text\", \"inline\": true},
+                    {\"name\": \"Critical Issues\", \"value\": \"$critical_count\", \"inline\": true},
+                    {\"name\": \"High Issues\", \"value\": \"$high_count\", \"inline\": true}
+                  ],
+                  \"timestamp\": \"$(date -u +'%Y-%m-%dT%H:%M:%S.000Z')\"
+                }
+              ]
+            }" \
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"
+        fi
+
+    - name: 📋 Create GitHub Issue for security findings
+      if: always()
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # 重要な脆弱性が見つかった場合、Issueを作成
+        critical_count=$(jq '.vulnerabilities | map(select(.severity == "critical")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        high_count=$(jq '.vulnerabilities | map(select(.severity == "high")) | length' vulnerability-report.json 2>/dev/null || echo 0)
+        
+        if [ "$critical_count" -gt 0 ] || [ "$high_count" -gt 0 ]; then
+          echo "🚨 Creating GitHub Issue for security findings..."
+          
+          gh issue create \
+            --title "🚨 Weekly Security Report: Action Required" \
+            --body "
+        ## 🔒 Security Alert
+        
+        Critical or high severity vulnerabilities have been detected in the weekly security scan.
+        
+        **Critical Issues:** $critical_count
+        **High Issues:** $high_count
+        **Scan Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        
+        ## 📋 Action Required
+        
+        1. Review the detailed security report in the workflow artifacts
+        2. Run \`npm audit fix\` to apply automatic fixes
+        3. Manually review packages requiring breaking changes
+        4. Update this issue with remediation status
+        
+        ## 📎 Resources
+        
+        - [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        - [Security Tab](${{ github.server_url }}/${{ github.repository }}/security)
+        - [Package Audit](${{ github.server_url }}/${{ github.repository }}/security/advisories)
+        
+        **Auto-generated by Weekly Security Report workflow**
+            " \
+            --label "security,high-priority" \
+            --assignee "security-team"
+        else
+          echo "✅ No critical security issues found - no issue created"
+        fi

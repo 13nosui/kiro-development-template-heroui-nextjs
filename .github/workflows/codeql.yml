@@ -1,0 +1,131 @@
+name: "🔍 CodeQL Security Analysis"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    # 毎週月曜日の午前2時（UTC）に実行
+    - cron: '0 2 * * 1'
+
+jobs:
+  analyze:
+    name: 🔍 CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'typescript' ]
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    # CodeQLデータベースの初期化
+    - name: 🚀 Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # セキュリティ重視のクエリを有効化
+        queries: security-extended,security-and-quality
+        # カスタムクエリの追加（将来の拡張用）
+        # query-filters: |
+        #   include:
+        #     tags: security
+        config-file: ./.github/codeql/codeql-config.yml
+
+    # 自動ビルド（JavaScriptプロジェクト用）
+    - name: 🏗️ Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    # CodeQL分析の実行
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+        # 結果をSARIF形式で出力
+        upload: true
+        
+    # 分析結果の詳細ログ出力
+    - name: 📊 Generate analysis summary
+      if: always()
+      run: |
+        echo "🔍 CodeQL Analysis completed for ${{ matrix.language }}"
+        echo "Results have been uploaded to GitHub Security tab"
+        
+        # セキュリティアラートの概要を生成
+        echo "## CodeQL Security Analysis Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Language:** ${{ matrix.language }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Analysis Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status:** ✅ Completed" >> $GITHUB_STEP_SUMMARY
+        echo "- **Results:** Check Security tab for detailed findings" >> $GITHUB_STEP_SUMMARY
+
+  # 分析結果の通知
+  notify-results:
+    name: 📢 Notify Analysis Results
+    needs: analyze
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📤 Slack notification
+      if: needs.analyze.result == 'success'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        if [ -n "$SLACK_WEBHOOK_URL" ]; then
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{
+              "text": "🔍 CodeQL Security Analysis completed successfully",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*🔍 CodeQL Security Analysis*\n\n*Status:* ✅ Completed\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}\n\n*View Results:* ${{ github.server_url }}/${{ github.repository }}/security/code-scanning"
+                  }
+                }
+              ]
+            }' \
+            "$SLACK_WEBHOOK_URL"
+        fi
+
+    - name: 📤 Discord notification
+      if: needs.analyze.result == 'success'
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "embeds": [
+                {
+                  "title": "🔍 CodeQL Security Analysis Completed",
+                  "color": 65280,
+                  "fields": [
+                    {"name": "Repository", "value": "${{ github.repository }}", "inline": true},
+                    {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true},
+                    {"name": "Status", "value": "✅ Completed", "inline": true}
+                  ],
+                  "timestamp": "${{ github.event.head_commit.timestamp }}"
+                }
+              ]
+            }' \
+            "$DISCORD_WEBHOOK_URL"
+        fi

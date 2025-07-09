@@ -1,0 +1,64 @@
+# Dependabot設定 - 依存関係の自動更新とセキュリティパッチ
+version: 2
+updates:
+  # NPMパッケージの監視
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    # セキュリティ脆弱性は即座に対応
+    open-pull-requests-limit: 10
+    reviewers:
+      - "development-team"
+    assignees:
+      - "security-team"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # 脆弱性のあるパッケージは優先的に更新
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    # セキュリティ関連は自動マージ
+    labels:
+      - "dependencies"
+      - "security"
+    # 開発用依存関係も監視
+    ignore:
+      # メジャーバージョンアップは手動レビュー
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions ワークフローの監視
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "security"
+
+  # Dockerfileの監視（将来の拡張用）
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "10:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
+    labels:
+      - "docker"
+      - "security"

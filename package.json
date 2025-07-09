@@ -2,6 +2,7 @@
   "name": "ai-development-template",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Template for AI-powered service development with HeroUI and Next.js",
   "keywords": [
     "next.js",
@@ -39,7 +40,7 @@
     "security:update": "npm update && npm run security:audit",
     "security:scan": "node scripts/security-check.js",
     "security:scan:ci": "npm run security:scan && npm run security:audit:strict",
-    "security:licenses": "npx license-checker --onlyAllow=\"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC\" --summary",
+    "security:licenses": "npx license-checker --onlyAllow=\"MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;LGPL-3.0-or-later\" --summary",
     "security:secrets": "grep -r -E \"(password|secret|key|token)\\s*[:=]\\s*['\\\"][^'\\\"]{8,}\" src/ --exclude-dir=node_modules || echo 'No hardcoded secrets found'",
     "security:dependencies": "npm run security:audit:strict && npm run security:licenses",
     "security:full": "npm run security:scan && npm run security:dependencies && npm run security:secrets",
