@@ -1,16 +1,21 @@
 # AI Development Template - HeroUI & Next.js
 
-このリポジトリは、**HeroUI** コンポーネントライブラリと **Next.js 15** を活用したAI駆動サービス開発のためのモダンなテンプレートです。美しく一貫性のあるUIと優れた開発体験を提供し、AIアプリケーションの迅速な構築を支援します。
+このリポジトリは、**HeroUI** コンポーネントライブラリと **Next.js 15** を活用した AI 駆動サービス開発のためのモダンなテンプレートです。美しく一貫性のある UI と優れた開発体験を提供し、AI アプリケーションの迅速な構築を支援します。
+
+⚠️ このリポジトリの.env ファイルはテンプレート用のダミー値です。
+本番運用や実際のサービス開発時は、必ずご自身の環境に合わせて適切な値に置き換えてください。
+.env.example も同様にサンプル値のみを記載しています。
+.gitignore で.env をコメントアウトしているので本番運用の際は必ず追加するようにしてください。
 
 ## ✨ 主な特徴
 
 - 🎨 **HeroUI**: 美しいデザインシステムとアクセシブルなコンポーネント
-- ⚡ **Next.js 15**: App Router による最新のReact開発環境
-- 🎯 **TypeScript**: 型安全な開発体験で信頼性の高いAIアプリ構築
-- 🎨 **Tailwind CSS**: ユーティリティファーストCSSフレームワーク
+- ⚡ **Next.js 15**: App Router による最新の React 開発環境
+- 🎯 **TypeScript**: 型安全な開発体験で信頼性の高い AI アプリ構築
+- 🎨 **Tailwind CSS**: ユーティリティファースト CSS フレームワーク
 - 📚 **Storybook**: コンポーネント開発・ドキュメント環境
 - 🔥 **Firebase**: 認証・データベース・ストレージの統合バックエンド
-- 🤖 **AI Ready**: AIサービス統合に最適化された構成
+- 🤖 **AI Ready**: AI サービス統合に最適化された構成
 
 ## 🚀 クイックスタート
 
@@ -82,7 +87,7 @@ pnpm dev
 pnpm storybook
 ```
 
-## 🎨 HeroUI活用ガイド
+## 🎨 HeroUI 活用ガイド
 
 ### 基本的なコンポーネント使用例
 
@@ -99,11 +104,7 @@ export default function ExampleForm() {
           placeholder="you@example.com"
           variant="bordered"
         />
-        <Input
-          type="password"
-          label="パスワード"
-          variant="bordered"
-        />
+        <Input type="password" label="パスワード" variant="bordered" />
         <Button color="primary" fullWidth>
           ログイン
         </Button>
@@ -115,7 +116,7 @@ export default function ExampleForm() {
 
 ### テーマカスタマイズ
 
-HeroUIのテーマシステムでプロジェクト固有のデザインを実現：
+HeroUI のテーマシステムでプロジェクト固有のデザインを実現：
 
 ```tsx
 // src/app/providers.tsx
@@ -132,11 +133,7 @@ const customTheme = {
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <HeroUIProvider theme={customTheme}>
-      {children}
-    </HeroUIProvider>
-  );
+  return <HeroUIProvider theme={customTheme}>{children}</HeroUIProvider>;
 }
 ```
 
@@ -162,7 +159,7 @@ src/
 pnpm storybook
 ```
 
-HeroUIコンポーネントの組み合わせやカスタマイズをStorybookで確認・テストできます。
+HeroUI コンポーネントの組み合わせやカスタマイズを Storybook で確認・テストできます。
 
 ### 型安全性とコード品質の確保
 
@@ -181,22 +178,22 @@ pnpm build
 
 詳細な開発ガイドラインは以下を参照：
 
-- **[DESIGN_GUIDELINE.md](./DESIGN_GUIDELINE.md)**: HeroUIベースのデザイン実装ガイド
+- **[DESIGN_GUIDELINE.md](./DESIGN_GUIDELINE.md)**: HeroUI ベースのデザイン実装ガイド
 - **[README.dev.md](./README.dev.md)**: 詳細な開発環境・技術仕様
 
 ### 推奨ワークフロー
 
-1. **コンポーネント設計**: HeroUIの既存コンポーネントで要件を満たせるか確認
-2. **Storybook開発**: 独立した環境でコンポーネントを開発・テスト
-3. **型安全実装**: TypeScriptの型システムを活用
-4. **アクセシビリティ**: HeroUIの組み込み機能を活用
+1. **コンポーネント設計**: HeroUI の既存コンポーネントで要件を満たせるか確認
+2. **Storybook 開発**: 独立した環境でコンポーネントを開発・テスト
+3. **型安全実装**: TypeScript の型システムを活用
+4. **アクセシビリティ**: HeroUI の組み込み機能を活用
 
 ## 🚀 デプロイ
 
 ### Vercel への自動デプロイ
 
-1. GitHubリポジトリをVercelに接続
-2. 環境変数をVercelダッシュボードで設定
+1. GitHub リポジトリを Vercel に接続
+2. 環境変数を Vercel ダッシュボードで設定
 3. `main` ブランチへのプッシュで自動デプロイ
 
 ```bash
@@ -208,12 +205,14 @@ pnpm start
 ## 📚 リソース
 
 ### 公式ドキュメント
+
 - [HeroUI Documentation](https://www.heroui.com/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Firebase](https://firebase.google.com/docs)
 
 ### コミュニティ
+
 - [HeroUI Discord](https://discord.gg/heroui)
 - [Next.js Discord](https://nextjs.org/discord)
 
@@ -231,4 +230,4 @@ pnpm start
 
 ---
 
-**HeroUI + Next.js で美しく機能的なWebアプリケーションを構築しましょう！** ✨
+**HeroUI + Next.js で美しく機能的な Web アプリケーションを構築しましょう！** ✨
