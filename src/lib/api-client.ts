@@ -6,7 +6,7 @@ import axios, {
   InternalAxiosRequestConfig
 } from 'axios';
 import { security } from './security';
-import { getEnvVar, getRequiredEnvVar } from './env';
+import { getEnvVar, getRequiredEnvVar, envUtils } from './env';
 
 // サーバーサイド実行判定
 const isServerSide = (): boolean => {
@@ -296,13 +296,16 @@ class ApiClient {
 
   private logError(context: string, error: AxiosError): void {
     if (this.config.enableLogging) {
-      console.error(`[API Error] ${context}`, {
-        url: error.config?.url,
-        method: error.config?.method,
-        status: error.response?.status,
-        message: error.message,
-        requestId: error.config?.headers?.['X-Request-ID'],
-      });
+      // 本番環境ではconsole.errorを無効化
+      if (!envUtils.isProduction()) {
+        console.error(`[API Error] ${context}`, {
+          url: error.config?.url,
+          method: error.config?.method,
+          status: error.response?.status,
+          message: error.message,
+          requestId: error.config?.headers?.['X-Request-ID'],
+        });
+      }
     }
   }
 
