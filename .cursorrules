@@ -132,7 +132,6 @@ User: "/commit && /push && /pr"
 
 1. 現在のブランチから main への PR を作成
 2. 変更内容を分析して PR 説明文を自動生成
-3. `gh pr create` で GitHub PR を作成
 
 ## フルワークフロー詳細
 
