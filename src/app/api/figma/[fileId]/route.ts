@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validators } from "../../../../lib/validation";
 import { security } from "../../../../lib/security";
-import { createFigmaApiClient } from "../../../../lib/api-client";
+import { createServerSideFigmaApiClient } from "../../../../lib/api-client";
 
 // Figma APIレスポンスの型定義
 interface FigmaFileResponse {
@@ -79,7 +79,7 @@ async function handleFigmaRequest(
     const sanitizedFileId = securityCheck.sanitized!;
 
     // 統合APIクライアントを使用してFigma APIを呼び出し
-    const figmaClient = createFigmaApiClient();
+    const figmaClient = createServerSideFigmaApiClient();
     const response = await figmaClient.get<FigmaFileResponse>(`/files/${sanitizedFileId}`);
 
     // レスポンスデータのサニタイゼーションと構造化

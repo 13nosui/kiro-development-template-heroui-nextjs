@@ -7,6 +7,19 @@ import axios, {
 } from 'axios';
 import { security } from './security';
 
+// サーバーサイド実行判定
+const isServerSide = (): boolean => {
+  return typeof window === 'undefined';
+};
+
+// 環境変数の安全な取得（サーバーサイドのみ）
+const getServerEnvVar = (key: string): string | undefined => {
+  if (!isServerSide()) {
+    throw new Error(`Environment variable ${key} can only be accessed on server side`);
+  }
+  return process.env[key];
+};
+
 // Node.js環境での型安全性を確保
 declare const process: {
   env: Record<string, string | undefined>;
@@ -362,9 +375,13 @@ export const createApiClient = (config?: ApiClientConfig): ApiClient => {
   return new ApiClient(config);
 };
 
-// Figma API専用クライアント
-export const createFigmaApiClient = (): ApiClient => {
-  const token = process.env.FIGMA_ACCESS_TOKEN || process.env.FIGMA_PERSONAL_ACCESS_TOKEN;
+// Figma API専用クライアント（サーバーサイド専用）
+export const createServerSideFigmaApiClient = (): ApiClient => {
+  if (!isServerSide()) {
+    throw new Error('Figma API client with token can only be created on server side');
+  }
+
+  const token = getServerEnvVar('FIGMA_ACCESS_TOKEN') || getServerEnvVar('FIGMA_PERSONAL_ACCESS_TOKEN');
   
   if (!token) {
     throw new Error('Figma access token is required. Please set FIGMA_ACCESS_TOKEN or FIGMA_PERSONAL_ACCESS_TOKEN environment variable.');
@@ -383,6 +400,68 @@ export const createFigmaApiClient = (): ApiClient => {
       'User-Agent': 'AI-Development-Template/1.0',
     },
   });
+};
+
+// クライアントサイド用Figma APIクライアント（API Routes経由）
+export const createClientSideFigmaApiClient = (): ApiClient => {
+  if (isServerSide()) {
+    throw new Error('Client-side Figma API client should not be used on server side');
+  }
+  
+  return createApiClient({
+    baseURL: '/api/figma',
+    timeout: 15000,
+    retryAttempts: 3,
+    customHeaders: {
+      'User-Agent': 'AI-Development-Template/1.0',
+    },
+  });
+};
+
+// 汎用Figma APIクライアント（実行環境に応じて適切なクライアントを返す）
+export const createFigmaApiClient = (): ApiClient => {
+  if (isServerSide()) {
+    return createServerSideFigmaApiClient();
+  } else {
+    return createClientSideFigmaApiClient();
+  }
+};
+
+// その他のサーバーサイド専用APIクライアント作成関数
+export const createServerSideApiClient = (config: ApiClientConfig & {
+  envTokenKey?: string;
+  tokenHeader?: string;
+}): ApiClient => {
+  if (!isServerSide()) {
+    throw new Error('Server-side API client can only be created on server side');
+  }
+
+  const { envTokenKey, tokenHeader, ...clientConfig } = config;
+  
+  if (envTokenKey) {
+    const token = getServerEnvVar(envTokenKey);
+    if (!token) {
+      throw new Error(`Environment variable ${envTokenKey} is required for server-side API client`);
+    }
+    
+    clientConfig.authConfig = {
+      type: tokenHeader ? 'apikey' : 'bearer',
+      token,
+      ...(tokenHeader && { apiKeyHeader: tokenHeader }),
+    };
+  }
+  
+  return createApiClient(clientConfig);
+};
+
+// クライアントサイド専用APIクライアント（認証情報なし）
+export const createClientSideApiClient = (config: Omit<ApiClientConfig, 'authConfig'>): ApiClient => {
+  if (isServerSide()) {
+    throw new Error('Client-side API client should not be used on server side');
+  }
+
+  // クライアントサイドでは認証情報を含めない
+  return createApiClient(config);
 };
 
 // デフォルトエクスポート
