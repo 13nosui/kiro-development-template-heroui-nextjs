@@ -371,4 +371,9 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+main().catch(error => {
+  // 本番環境ではconsole.errorを無効化
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(error);
+  }
+});

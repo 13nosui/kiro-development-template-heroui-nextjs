@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { envUtils } from '../src/lib/env';
 
 // Node.js環境の型定義
 declare const process: {
@@ -54,7 +55,10 @@ const createWebhook = async () => {
     
     console.log('✅ Webhook created successfully:', response.data);
   } catch (error: any) {
-    console.error('❌ Error creating webhook:', error.response?.data || error.message);
+    // 本番環境ではconsole.errorを無効化
+    if (!envUtils.isProduction()) {
+      console.error('❌ Error creating webhook:', error.response?.data || error.message);
+    }
     process.exit(1);
   }
 };
