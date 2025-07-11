@@ -184,6 +184,131 @@ export function validateFirebaseConfig(): { success: true; config: FirebaseConfi
 }
 
 /**
+ * Safe environment variable getter
+ * Returns null if environment variable is not set or is empty
+ */
+export function getEnvVar(key: string): string | null {
+  const value = process.env[key];
+  return value && value.trim() !== '' ? value : null;
+}
+
+/**
+ * Environment variable getter with default value
+ */
+export function getEnvVarWithDefault(key: string, defaultValue: string): string {
+  const value = getEnvVar(key);
+  return value !== null ? value : defaultValue;
+}
+
+/**
+ * Required environment variable getter
+ * Throws error if environment variable is not set
+ */
+export function getRequiredEnvVar(key: string): string {
+  const value = getEnvVar(key);
+  if (value === null) {
+    throw new Error(`Environment variable ${key} is required but not set`);
+  }
+  return value;
+}
+
+/**
+ * Environment variable getter with validation
+ */
+export function getValidatedEnvVar(
+  key: string,
+  validator: (value: string) => boolean,
+  errorMessage?: string
+): string | null {
+  const value = getEnvVar(key);
+  if (value === null) {
+    return null;
+  }
+  
+  if (!validator(value)) {
+    throw new Error(errorMessage || `Environment variable ${key} has invalid value`);
+  }
+  
+  return value;
+}
+
+/**
+ * Required environment variable getter with validation
+ */
+export function getRequiredValidatedEnvVar(
+  key: string,
+  validator: (value: string) => boolean,
+  errorMessage?: string
+): string {
+  const value = getRequiredEnvVar(key);
+  
+  if (!validator(value)) {
+    throw new Error(errorMessage || `Environment variable ${key} has invalid value`);
+  }
+  
+  return value;
+}
+
+/**
+ * Get numeric environment variable
+ */
+export function getNumericEnvVar(key: string): number | null {
+  const value = getEnvVar(key);
+  if (value === null) {
+    return null;
+  }
+  
+  const num = Number(value);
+  if (isNaN(num)) {
+    throw new Error(`Environment variable ${key} is not a valid number`);
+  }
+  
+  return num;
+}
+
+/**
+ * Get required numeric environment variable
+ */
+export function getRequiredNumericEnvVar(key: string): number {
+  const value = getNumericEnvVar(key);
+  if (value === null) {
+    throw new Error(`Environment variable ${key} is required but not set`);
+  }
+  return value;
+}
+
+/**
+ * Get boolean environment variable
+ */
+export function getBooleanEnvVar(key: string): boolean | null {
+  const value = getEnvVar(key);
+  if (value === null) {
+    return null;
+  }
+  
+  const lowercaseValue = value.toLowerCase();
+  if (lowercaseValue === 'true' || lowercaseValue === '1') {
+    return true;
+  }
+  if (lowercaseValue === 'false' || lowercaseValue === '0') {
+    return false;
+  }
+  
+  throw new Error(`Environment variable ${key} is not a valid boolean`);
+}
+
+/**
+ * Get required boolean environment variable
+ */
+export function getRequiredBooleanEnvVar(key: string): boolean {
+  const value = getBooleanEnvVar(key);
+  if (value === null) {
+    throw new Error(`Environment variable ${key} is required but not set`);
+  }
+  return value;
+}
+
+/**
  * Development utilities
  */
 export const envUtils = {
