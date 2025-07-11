@@ -5,6 +5,9 @@
  * 必要な環境変数の存在、形式、セキュリティ要件をチェックします
  */
 
+// .envファイルを読み込み
+require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
 
