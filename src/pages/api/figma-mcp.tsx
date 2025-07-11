@@ -5,6 +5,7 @@ import crypto from "crypto";
 import axios from "axios";
 import { validators, createValidationErrorResponse } from "../../lib/validation";
 import { security } from "../../lib/security";
+import { getEnvVar } from "../../lib/env";
 
 // Figma Webhookの署名検証
 function verifySignature(req: NextApiRequest, secret: string) {
@@ -39,7 +40,6 @@ export default async function handler(
   // GET /api/figma-mcp?fileId=...&nodeId=...
   if (req.method === "GET") {
     const { fileId, nodeId } = req.query;
-    const token = process.env.FIGMA_PERSONAL_ACCESS_TOKEN;
     
     if (!fileId || !nodeId) {
       return res
@@ -47,10 +47,21 @@ export default async function handler(
         .json({ error: "Missing fileId or nodeId parameters" });
     }
     
+    // 環境変数の安全な取得
+    const figmaAccessToken = getEnvVar('FIGMA_ACCESS_TOKEN');
+    const figmaPersonalToken = getEnvVar('FIGMA_PERSONAL_ACCESS_TOKEN');
+    const token = figmaAccessToken || figmaPersonalToken;
+    
     if (!token) {
       return res
         .status(500)
-        .json({ error: "Figma personal access token not configured" });
+        .json({ 
+          error: "Figma access token not configured. Please set FIGMA_ACCESS_TOKEN or FIGMA_PERSONAL_ACCESS_TOKEN environment variable.",
+          debug: {
+            figmaAccessToken: figmaAccessToken ? 'set' : 'not set',
+            figmaPersonalToken: figmaPersonalToken ? 'set' : 'not set'
+          }
+        });
     }
 
     // パラメータのバリデーション
@@ -114,7 +125,13 @@ export default async function handler(
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const secret = process.env.FIGMA_WEBHOOK_SECRET || "";
+  const secret = getEnvVar('FIGMA_WEBHOOK_SECRET');
+  if (!secret) {
+    return res.status(500).json({ 
+      error: "Figma webhook secret not configured. Please set FIGMA_WEBHOOK_SECRET environment variable." 
+    });
+  }
+  
   if (!verifySignature(req, secret)) {
     return res.status(401).json({ error: "Invalid signature" });
   }

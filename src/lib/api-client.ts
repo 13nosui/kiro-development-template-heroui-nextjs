@@ -6,6 +6,7 @@ import axios, {
   InternalAxiosRequestConfig
 } from 'axios';
 import { security } from './security';
+import { getEnvVar, getRequiredEnvVar } from './env';
 
 // サーバーサイド実行判定
 const isServerSide = (): boolean => {
@@ -13,16 +14,19 @@ const isServerSide = (): boolean => {
 };
 
 // 環境変数の安全な取得（サーバーサイドのみ）
-const getServerEnvVar = (key: string): string | undefined => {
+const getServerEnvVar = (key: string): string | null => {
   if (!isServerSide()) {
     throw new Error(`Environment variable ${key} can only be accessed on server side`);
   }
-  return process.env[key];
+  return getEnvVar(key);
 };
 
-// Node.js環境での型安全性を確保
-declare const process: {
-  env: Record<string, string | undefined>;
+// 必須環境変数の取得（サーバーサイドのみ）
+const getRequiredServerEnvVar = (key: string): string => {
+  if (!isServerSide()) {
+    throw new Error(`Environment variable ${key} can only be accessed on server side`);
+  }
+  return getRequiredEnvVar(key);
 };
 
 // APIクライアント設定インターフェース
@@ -381,10 +385,18 @@ export const createServerSideFigmaApiClient = (): ApiClient => {
     throw new Error('Figma API client with token can only be created on server side');
   }
 
-  const token = getServerEnvVar('FIGMA_ACCESS_TOKEN') || getServerEnvVar('FIGMA_PERSONAL_ACCESS_TOKEN');
+  // 環境変数の優先順位: FIGMA_ACCESS_TOKEN > FIGMA_PERSONAL_ACCESS_TOKEN
+  const accessToken = getServerEnvVar('FIGMA_ACCESS_TOKEN');
+  const personalToken = getServerEnvVar('FIGMA_PERSONAL_ACCESS_TOKEN');
+  
+  const token = accessToken || personalToken;
   
   if (!token) {
-    throw new Error('Figma access token is required. Please set FIGMA_ACCESS_TOKEN or FIGMA_PERSONAL_ACCESS_TOKEN environment variable.');
+    throw new Error(
+      'Figma access token is required. Please set FIGMA_ACCESS_TOKEN or FIGMA_PERSONAL_ACCESS_TOKEN environment variable. ' +
+      'Available tokens: FIGMA_ACCESS_TOKEN=' + (accessToken ? 'set' : 'not set') + ', ' +
+      'FIGMA_PERSONAL_ACCESS_TOKEN=' + (personalToken ? 'set' : 'not set')
+    );
   }
   
   return createApiClient({
@@ -431,17 +443,24 @@ export const createFigmaApiClient = (): ApiClient => {
 export const createServerSideApiClient = (config: ApiClientConfig & {
   envTokenKey?: string;
   tokenHeader?: string;
+  required?: boolean;
 }): ApiClient => {
   if (!isServerSide()) {
     throw new Error('Server-side API client can only be created on server side');
   }
 
-  const { envTokenKey, tokenHeader, ...clientConfig } = config;
+  const { envTokenKey, tokenHeader, required = true, ...clientConfig } = config;
   
   if (envTokenKey) {
-    const token = getServerEnvVar(envTokenKey);
+    const token = required ? getRequiredServerEnvVar(envTokenKey) : getServerEnvVar(envTokenKey);
+    
     if (!token) {
-      throw new Error(`Environment variable ${envTokenKey} is required for server-side API client`);
+      if (required) {
+        throw new Error(`Environment variable ${envTokenKey} is required for server-side API client`);
+      } else {
+        // トークンが不要な場合は認証設定をスキップ
+        return createApiClient(clientConfig);
+      }
     }
     
     clientConfig.authConfig = {
