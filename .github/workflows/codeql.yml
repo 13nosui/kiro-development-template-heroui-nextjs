@@ -43,7 +43,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         # セキュリティ重視のクエリを有効化
-        queries: security-extended,security-and-quality
+        queries: security-and-quality
         # カスタムクエリの追加（将来の拡張用）
         # query-filters: |
         #   include:
