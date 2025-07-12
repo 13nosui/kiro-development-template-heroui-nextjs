@@ -91,24 +91,7 @@ jobs:
           cat audit-results.json
         fi
       timeout-minutes: 5
-      
-    - name: Semgrep Security Scan (Enhanced)
-      uses: semgrep/semgrep-action@v2
-      with:
-        config: >-
-          p/security-audit
-          p/typescript
-          p/react
-          p/owasp-top-ten
-          p/javascript
-          p/nextjs
-          .semgrep.yml
-        generateSarif: "1"
-      env:
-        SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-      continue-on-error: false
-      timeout-minutes: 8
-      
+        
     - name: Check environment variables template
       run: |
         if [ ! -f ".env.example" ]; then
@@ -168,3 +151,45 @@ jobs:
           security-report.json
           audit-results.json
         retention-days: 30
+
+  semgrep:
+    name: "🔍 Semgrep SAST Analysis"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    container:
+      image: semgrep/semgrep
+    
+    if: github.actor != 'dependabot[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run Semgrep SAST scan
+        run: |
+          echo "🔍 Starting Semgrep security analysis..."
+          semgrep ci \
+            --config p/security-audit \
+            --config p/typescript \
+            --config p/react \
+            --config p/owasp-top-ten \
+            --config p/javascript \
+            --config p/nextjs \
+            --config .semgrep.yml \
+            --sarif \
+            --output semgrep-results.sarif \
+            --verbose
+          echo "✅ Semgrep analysis completed"
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        continue-on-error: false
+        timeout-minutes: 10
+        
+      - name: Upload SARIF results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-sarif-results
+          path: semgrep-results.sarif
+          retention-days: 30
