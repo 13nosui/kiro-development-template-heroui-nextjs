@@ -5,7 +5,7 @@ disable-default-queries: false
 # 実行するクエリスイートの設定
 queries:
   # セキュリティ関連のクエリを優先
-  uses: security-and-quality
+  - uses: security-and-quality
 
 # パス設定
 paths:
@@ -34,14 +34,10 @@ paths-ignore:
   - "**/__tests__/**"
   - "**/storybook-static/**"
 
-# 追加のパック（将来の拡張用）
+# 追加のパック（安全に動作するもののみ）
 packs:
-  # Node.js セキュリティパック
+  # 標準的なJavaScriptセキュリティパック
   - codeql/javascript-queries
-  # React セキュリティパック
-  - codeql/javascript-queries:Security
-  # TypeScript セキュリティパック
-  - codeql/javascript-queries:security-extended
 
 # カスタムクエリの設定（プロジェクト固有）
 query-filters:
