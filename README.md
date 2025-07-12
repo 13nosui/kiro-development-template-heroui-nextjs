@@ -188,6 +188,35 @@ pnpm build
 3. **型安全実装**: TypeScript の型システムを活用
 4. **アクセシビリティ**: HeroUI の組み込み機能を活用
 
+## 🔐 セキュリティ設定
+
+### Semgrep セキュリティスキャン
+
+このプロジェクトはSemgrepを使用した自動セキュリティスキャンを実装しています。
+
+#### 設定手順
+
+1. [Semgrep AppSec Platform](https://semgrep.dev/app) にアカウントを作成
+2. **Settings > Tokens** に移動
+3. **Create new token** をクリック
+4. **Agent (CI)** スコープを選択
+5. 生成されたトークンをコピー
+6. GitHub リポジトリの **Settings > Secrets and variables > Actions** に移動
+7. **New repository secret** をクリック
+8. 名前: `SEMGREP_APP_TOKEN`
+9. 値: コピーしたトークンを貼り付け
+10. **Add secret** をクリック
+
+#### ローカル開発での使用
+
+```bash
+# .env.local に追加
+SEMGREP_APP_TOKEN=your_actual_token_here
+
+# ローカルでスキャンを実行
+npx semgrep --config=auto src/
+```
+
 ## 🚀 デプロイ
 
 ### Vercel への自動デプロイ
