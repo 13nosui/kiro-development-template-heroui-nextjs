@@ -39,7 +39,7 @@ jobs:
 
     # CodeQLデータベースの初期化
     - name: 🚀 Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         # セキュリティ重視のクエリを有効化
@@ -52,11 +52,11 @@ jobs:
 
     # 自動ビルド（JavaScriptプロジェクト用）
     - name: 🏗️ Autobuild
-      uses: github/codeql-action/autobuild@v4
+      uses: github/codeql-action/autobuild@v3
 
     # CodeQL分析の実行
     - name: 🔍 Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
         # 結果をSARIF形式で出力
