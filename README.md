@@ -60,6 +60,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890abcdef
 ENCRYPTION_KEY=12345678901234567890123456789012
 JWT_SECRET=jwt-secret-key-1234567890123456
 CSRF_SECRET=csrf-secret-key-1234567890123456
+SEMGREP_APP_TOKEN=your_actual_token_here
 
 # 外部サービス（オプション）
 FIGMA_ACCESS_TOKEN=figd_your-figma-access-token
@@ -192,7 +193,7 @@ pnpm build
 
 ### Semgrep セキュリティスキャン
 
-このプロジェクトはSemgrepを使用した自動セキュリティスキャンを実装しています。
+このプロジェクトは Semgrep を使用した自動セキュリティスキャンを実装しています。
 
 #### 設定手順
 

@@ -44,7 +44,7 @@
     "security:secrets": "grep -r -E \"(password|secret|key|token)\\s*[:=]\\s*['\\\"][^'\\\"]{8,}\" src/ --exclude-dir=node_modules || echo 'No hardcoded secrets found'",
     "security:dependencies": "npm run security:audit:strict && npm run security:licenses",
     "security:full": "npm run security:scan && npm run security:dependencies && npm run security:secrets",
-"security:semgrep": "semgrep --config=auto src/",
+    "security:semgrep": "semgrep --config=auto src/",
     "security:semgrep:ci": "semgrep ci --config=auto",
     "security:setup": "echo 'Please set SEMGREP_APP_TOKEN in your environment variables'",
     "env:check": "node -e \"if(!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) console.warn('Warning: NEXT_PUBLIC_FIREBASE_API_KEY not set');\"",
