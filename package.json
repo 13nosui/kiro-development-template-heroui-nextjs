@@ -48,7 +48,10 @@
     "security:semgrep:ci": "semgrep ci --config=auto",
     "security:setup": "echo 'Please set SEMGREP_APP_TOKEN in your environment variables'",
     "env:check": "node -e \"if(!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) console.warn('Warning: NEXT_PUBLIC_FIREBASE_API_KEY not set');\"",
-    "env:validate": "node scripts/validate-env.js"
+    "env:validate": "node scripts/validate-env.js",
+    "docs:generate": "tsx scripts/generate-docs.ts --verbose",
+    "docs:generate:quiet": "tsx scripts/generate-docs.ts",
+    "docs:clean": "rm -rf docs/generated/*"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
