@@ -1,8 +1,10 @@
-# AI Development Template - ドキュメント
+# AI Development Template - Documentation
 
-## 📚 ドキュメント概要
+## 📚 Documentation Overview
 
-AI Development Template の包括的なドキュメントへようこそ。このドキュメントは、プロジェクトの理解、開発、運用に必要なすべての情報を提供します。
+Welcome to the comprehensive documentation for the AI Development Template. This documentation provides all the information you need to understand, develop, and operate the project.
+
+> **New!** Check out our [Documentation Index](./index.md) for a complete overview of all documentation with cross-references and our new [Search Functionality](./search.md) to quickly find what you need.
 
 ## 🚀 クイックスタート
 

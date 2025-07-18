@@ -1,75 +1,78 @@
-# ドキュメントナビゲーション
+# Documentation Navigation
 
-## 🏠 [ホーム](README.md)
+## 🏠 [Home](README.md)
 
-## 🚀 はじめに
+## 📚 [Documentation Index](index.md)
 
-- [プロジェクト概要](project-overview.md)
-- [開発者ガイド](development/developer-guide.md)
-- [ビルドシステム](development/build-system-and-tools.md)
+## 🚀 Getting Started
 
-## 🏗 アーキテクチャ
+- [Project Overview](project-overview.md)
+- [Developer Guide](development/developer-guide.md)
+- [Build System](development/build-system-and-tools.md)
 
-- [システム概要](architecture/system-overview.md)
-- [コンポーネントアーキテクチャ](architecture/component-architecture.md)
-- [データフロー](architecture/data-flow.md)
-- [認証フロー](architecture/authentication-flows.md)
-- [API 統合フロー](architecture/api-integration-flows.md)
+## 🏗 Architecture
 
-## 💻 開発
+- [System Overview](architecture/system-overview.md)
+- [Component Architecture](architecture/component-architecture.md)
+- [Data Flow](architecture/data-flow.md)
+- [Authentication Flows](architecture/authentication-flows.md)
+- [API Integration Flows](architecture/api-integration-flows.md)
 
-- [カスタムフック](development/custom-hooks.md)
-- [ユーティリティ関数](development/utility-functions.md)
-- [テスト・品質保証](development/testing-and-quality-assurance.md)
+## 💻 Development
+
+- [Custom Hooks](development/custom-hooks.md)
+- [Utility Functions](development/utility-functions.md)
+- [Testing & Quality Assurance](development/testing-and-quality-assurance.md)
 
 ## 🔌 API
 
-- [API 概要](api/README.md)
-- [OpenAPI 仕様](api/openapi.yaml)
-- [使用例](api/usage-examples.md)
-- [エラーハンドリング](api/error-handling.md)
-- [セキュリティ・レート制限](api/security-and-rate-limiting.md)
+- [API Overview](api/README.md)
+- [OpenAPI Specification](api/openapi.yaml)
+- [Usage Examples](api/usage-examples.md)
+- [Error Handling](api/error-handling.md)
+- [Security & Rate Limiting](api/security-and-rate-limiting.md)
 
-## 🧩 コンポーネント
+## 🧩 Components
 
-- [コンポーネントカタログ](components/component-catalog.md)
+- [Component Catalog](components/component-catalog.md)
 
-## 🔐 セキュリティ
+## 🔐 Security
 
-- [セキュリティアーキテクチャ](security/security-architecture.md)
-- [セキュリティ実装](SECURITY_IMPLEMENTATION.md)
-- [セキュリティ運用](SECURITY_OPERATIONS.md)
+- [Security Architecture](security/security-architecture.md)
+- [Security Implementation](SECURITY_IMPLEMENTATION.md)
+- [Security Operations](SECURITY_OPERATIONS.md)
 
-## 📊 型定義・データ
+## 📊 Types & Data
 
-- [型定義カタログ](types/type-definitions-catalog.md)
-- [データモデル・スキーマ](types/data-models-and-schemas.md)
+- [Type Definitions Catalog](types/type-definitions-catalog.md)
+- [Data Models & Schemas](types/data-models-and-schemas.md)
 
-## 🚀 デプロイ・運用
+## 🚀 Deployment & Operations
 
-- [環境・デプロイメント](deployment/environment-and-deployment.md)
-- [GitHub Secrets ガイド](github-secrets-guide.md)
+- [Environment & Deployment](deployment/environment-and-deployment.md)
+- [GitHub Secrets Guide](github-secrets-guide.md)
 
-## 📝 ガイド・テンプレート
+## 📝 Guides & Templates
 
-- [AI 実装ルール](AI_IMPLEMENTATION_RULES.md)
-- [リファクタリングガイド](REFACTORING_GUIDE.md)
-- [Claude コマンドガイド](CLAUDE_CODE_SLASH_COMMANDS_GUIDE.md)
+- [AI Implementation Rules](AI_IMPLEMENTATION_RULES.md)
+- [Refactoring Guide](REFACTORING_GUIDE.md)
+- [Claude Command Guide](CLAUDE_CODE_SLASH_COMMANDS_GUIDE.md)
 
 ---
 
-## 🔍 クイック検索
+## 🔍 Quick Search
 
-### 技術別
+### By Role
 
-- **Next.js**: [ビルドシステム](development/build-system-and-tools.md), [開発者ガイド](development/developer-guide.md)
-- **TypeScript**: [型定義カタログ](types/type-definitions-catalog.md), [開発者ガイド](development/developer-guide.md)
-- **React**: [コンポーネントカタログ](components/component-catalog.md), [カスタムフック](development/custom-hooks.md)
-- **Firebase**: [認証フロー](architecture/authentication-flows.md), [環境・デプロイメント](deployment/environment-and-deployment.md)
+- **New Developer**: [Project Overview](project-overview.md) → [Developer Guide](development/developer-guide.md)
+- **Frontend Developer**: [Component Catalog](components/component-catalog.md) → [Custom Hooks](development/custom-hooks.md)
+- **Backend Developer**: [API Overview](api/README.md) → [Authentication Flows](architecture/authentication-flows.md)
+- **DevOps Engineer**: [Environment & Deployment](deployment/environment-and-deployment.md) → [Security Operations](SECURITY_OPERATIONS.md)
 
-### 用途別
+### By Technology
 
-- **新規開発者**: [プロジェクト概要](project-overview.md) → [開発者ガイド](development/developer-guide.md)
-- **API 開発**: [API 概要](api/README.md) → [OpenAPI 仕様](api/openapi.yaml)
-- **UI 開発**: [コンポーネントカタログ](components/component-catalog.md) → [カスタムフック](development/custom-hooks.md)
-- **セキュリティ**: [セキュリティアーキテクチャ](security/security-architecture.md) → [セキュリティ実装](SECURITY_IMPLEMENTATION.md)
+- **Next.js**: [Build System](development/build-system-and-tools.md), [Developer Guide](development/developer-guide.md)
+- **TypeScript**: [Type Definitions Catalog](types/type-definitions-catalog.md), [Data Models](types/data-models-and-schemas.md)
+- **React**: [Component Catalog](components/component-catalog.md), [Custom Hooks](development/custom-hooks.md)
+- **Firebase**: [Authentication Flows](architecture/authentication-flows.md), [Environment & Deployment](deployment/environment-and-deployment.md)
+- **Figma API**: [API Integration Flows](architecture/api-integration-flows.md), [Custom Hooks](development/custom-hooks.md)
