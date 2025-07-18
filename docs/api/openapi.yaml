@@ -1,0 +1,656 @@
+openapi: 3.0.3
+info:
+  title: AI Development Template API
+  description: |
+    REST API for the AI Development Template with HeroUI and Next.js.
+
+    This API provides secure endpoints for Figma integration and external service communication.
+    All endpoints implement comprehensive security measures including input validation,
+    XSS protection, SQL injection prevention, and rate limiting.
+
+    ## Security
+
+    - **Input Validation**: All inputs are validated using Zod schemas
+    - **XSS Protection**: Input and output sanitization using DOMPurify
+    - **SQL Injection Protection**: Pattern detection and input sanitization
+    - **Rate Limiting**: 100 requests per hour per IP address
+    - **Security Headers**: Comprehensive security headers on all responses
+
+    ## Authentication
+
+    Server-side endpoints use environment-based authentication:
+    - Figma API endpoints require `FIGMA_ACCESS_TOKEN` or `FIGMA_PERSONAL_ACCESS_TOKEN`
+    - Webhook endpoints require `FIGMA_WEBHOOK_SECRET` for signature verification
+
+    ## Error Handling
+
+    All endpoints return consistent error responses with:
+    - Human-readable error messages
+    - Machine-readable error codes
+    - Detailed validation errors when applicable
+    - Unique request IDs for tracking
+    - ISO 8601 timestamps
+
+  version: 1.0.0
+  contact:
+    name: AI Development Template
+    url: https://github.com/13nosui/kiro-development-template-heroui-nextjs
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://your-domain.com
+    description: Production server
+
+paths:
+  /api/figma/{fileId}:
+    get:
+      summary: Get Figma file information
+      description: |
+        Retrieves comprehensive information about a Figma file by its ID.
+
+        This endpoint:
+        - Validates the file ID format and security
+        - Fetches data from the Figma API using server-side authentication
+        - Sanitizes all response data to prevent XSS attacks
+        - Implements caching with a 5-minute TTL
+        - Returns rate limiting information in headers
+
+        **Security Features:**
+        - Input validation with Zod schemas
+        - XSS protection on all string values
+        - Security event logging for suspicious requests
+        - Request ID tracking for debugging
+
+      tags:
+        - Figma API
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          description: |
+            Figma file ID. Must be alphanumeric characters, underscores, or hyphens only.
+            Maximum length of 100 characters.
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+            minLength: 1
+            maxLength: 100
+          example: "abc123def456"
+      responses:
+        "200":
+          description: Figma file information retrieved successfully
+          headers:
+            X-Request-ID:
+              description: Unique request identifier for tracking
+              schema:
+                type: string
+                example: "figma_1705312500000_abc123"
+            Cache-Control:
+              description: Cache control directive
+              schema:
+                type: string
+                example: "private, max-age=300"
+            X-Rate-Limit-Remaining:
+              description: Number of requests remaining in the current window
+              schema:
+                type: integer
+                example: 99
+            X-Rate-Limit-Reset:
+              description: Unix timestamp when the rate limit window resets
+              schema:
+                type: integer
+                example: 1705312800
+            X-Rate-Limit-Limit:
+              description: Maximum number of requests allowed in the window
+              schema:
+                type: integer
+                example: 100
+            Access-Control-Allow-Origin:
+              description: CORS allowed origin
+              schema:
+                type: string
+                example: "https://your-domain.com"
+            Access-Control-Allow-Credentials:
+              description: CORS credentials allowed
+              schema:
+                type: string
+                example: "true"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FigmaFileResponse"
+              examples:
+                success:
+                  summary: Successful response
+                  value:
+                    name: "Design System Components"
+                    lastModified: "2024-01-15T10:30:00Z"
+                    version: "1.2.3"
+                    document:
+                      id: "0:1"
+                      name: "Page 1"
+                      type: "CANVAS"
+                    metadata:
+                      timestamp: "2024-01-15T10:35:00Z"
+                      requestId: "figma_1705312500000_abc123"
+                      status: "success"
+        "400":
+          description: Bad request - validation or security error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                validation_error:
+                  summary: Validation error
+                  value:
+                    error: "Invalid file ID format"
+                    code: "VALIDATION_ERROR"
+                    details:
+                      - field: "fileId"
+                        message: "ファイルIDの形式が無効です"
+                        code: "invalid_string"
+                    timestamp: "2024-01-15T10:35:00Z"
+                    requestId: "figma_1705312500000_abc123"
+                security_error:
+                  summary: Security validation failed
+                  value:
+                    error: "Security validation failed"
+                    code: "SECURITY_ERROR"
+                    details:
+                      - field: "input"
+                        message: "XSS攻撃の可能性があります"
+                    timestamp: "2024-01-15T10:35:00Z"
+                    requestId: "figma_1705312500000_abc123"
+        "405":
+          description: Method not allowed
+          headers:
+            Allow:
+              description: Allowed HTTP methods
+              schema:
+                type: string
+                example: "GET"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Method not allowed"
+                code: "METHOD_NOT_ALLOWED"
+                timestamp: "2024-01-15T10:35:00Z"
+        "429":
+          description: Rate limit exceeded
+          headers:
+            X-Rate-Limit-Remaining:
+              description: Number of requests remaining (0)
+              schema:
+                type: integer
+                example: 0
+            X-Rate-Limit-Reset:
+              description: Unix timestamp when the rate limit window resets
+              schema:
+                type: integer
+                example: 1705312800
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Rate limit exceeded"
+                code: "RATE_LIMIT_EXCEEDED"
+                timestamp: "2024-01-15T10:35:00Z"
+                requestId: "figma_1705312500000_abc123"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Internal server error"
+                code: "INTERNAL_ERROR"
+                timestamp: "2024-01-15T10:35:00Z"
+                requestId: "figma_1705312500000_abc123"
+
+  /api/figma-mcp:
+    get:
+      summary: Get Figma node information (MCP)
+      description: |
+        Retrieves specific node information from a Figma file using the Model Context Protocol (MCP).
+
+        This endpoint:
+        - Validates both file ID and node ID parameters
+        - Fetches specific node data from the Figma API
+        - Recursively sanitizes all response data for XSS protection
+        - Supports complex node hierarchies and relationships
+
+        **Use Cases:**
+        - Retrieving specific component information
+        - Accessing node properties and styles
+        - Getting component instances and variants
+
+      tags:
+        - Figma API
+        - MCP
+      parameters:
+        - name: fileId
+          in: query
+          required: true
+          description: Figma file ID containing the target node
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9_-]+$"
+            minLength: 1
+            maxLength: 100
+          example: "abc123def456"
+        - name: nodeId
+          in: query
+          required: true
+          description: |
+            Figma node ID. Can contain alphanumeric characters, colons, underscores, and hyphens.
+            Node IDs often use colon notation (e.g., "1:2", "123:456").
+          schema:
+            type: string
+            pattern: "^[A-Za-z0-9:_-]+$"
+            minLength: 1
+            maxLength: 100
+          example: "1:2"
+      responses:
+        "200":
+          description: Figma node information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FigmaMcpResponse"
+              example:
+                nodes:
+                  "1:2":
+                    document:
+                      id: "1:2"
+                      name: "Button Component"
+                      type: "COMPONENT"
+                      children: []
+        "400":
+          description: Bad request - missing parameters or validation error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - type: object
+                    properties:
+                      error:
+                        type: string
+                        example: "Missing fileId or nodeId parameters"
+        "500":
+          description: Server error - configuration or API error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorResponse"
+                  - type: object
+                    properties:
+                      error:
+                        type: string
+                        example: "Figma access token not configured. Please set FIGMA_ACCESS_TOKEN or FIGMA_PERSONAL_ACCESS_TOKEN environment variable."
+                      debug:
+                        type: object
+                        properties:
+                          figmaAccessToken:
+                            type: string
+                            example: "not set"
+                          figmaPersonalToken:
+                            type: string
+                            example: "not set"
+
+    post:
+      summary: Figma webhook endpoint
+      description: |
+        Receives webhook events from Figma when files are updated or other events occur.
+
+        This endpoint:
+        - Verifies webhook signatures using HMAC-SHA256
+        - Processes different event types (FILE_UPDATE, etc.)
+        - Logs all webhook events for monitoring
+        - Returns appropriate responses based on event type
+
+        **Security:**
+        - Signature verification prevents unauthorized requests
+        - All request bodies are validated and logged
+        - Environment variable required for webhook secret
+
+      tags:
+        - Figma API
+        - Webhooks
+      parameters:
+        - name: X-Figma-Signature
+          in: header
+          required: true
+          description: |
+            HMAC-SHA256 signature of the request body using the webhook secret.
+            Format: "sha256={signature}"
+          schema:
+            type: string
+            example: "sha256=abc123def456..."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FigmaWebhookEvent"
+            examples:
+              file_update:
+                summary: File update event
+                value:
+                  event_type: "FILE_UPDATE"
+                  file_key: "abc123def456"
+                  timestamp: "2024-01-15T10:30:00Z"
+              generic_event:
+                summary: Generic webhook event
+                value:
+                  event_type: "CUSTOM_EVENT"
+                  data:
+                    custom_field: "custom_value"
+      responses:
+        "200":
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                file_update:
+                  summary: File update processed
+                  value:
+                    message: "ファイル更新イベントを受信しました"
+                default:
+                  summary: Default response
+                  value:
+                    message: "Figma MCPサーバーが動作しています。"
+        "401":
+          description: Unauthorized - invalid signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid signature"
+        "405":
+          description: Method not allowed
+          headers:
+            Allow:
+              description: Allowed HTTP methods
+              schema:
+                type: string
+                example: "POST, GET"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Method GET Not Allowed"
+        "500":
+          description: Server configuration error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Figma webhook secret not configured. Please set FIGMA_WEBHOOK_SECRET environment variable."
+
+components:
+  schemas:
+    FigmaFileResponse:
+      type: object
+      required:
+        - name
+        - lastModified
+        - version
+        - metadata
+      properties:
+        name:
+          type: string
+          description: Name of the Figma file (XSS-filtered)
+          example: "Design System Components"
+        lastModified:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of last modification
+          example: "2024-01-15T10:30:00Z"
+        version:
+          type: string
+          description: Version string of the file (XSS-filtered)
+          example: "1.2.3"
+        document:
+          type: object
+          description: Document information (optional)
+          properties:
+            id:
+              type: string
+              description: Document ID (XSS-filtered)
+              example: "0:1"
+            name:
+              type: string
+              description: Document name (XSS-filtered)
+              example: "Page 1"
+            type:
+              type: string
+              description: Document type (XSS-filtered)
+              example: "CANVAS"
+        metadata:
+          type: object
+          required:
+            - timestamp
+            - requestId
+            - status
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+              description: Response generation timestamp
+              example: "2024-01-15T10:35:00Z"
+            requestId:
+              type: string
+              description: Unique request identifier
+              example: "figma_1705312500000_abc123"
+            status:
+              type: string
+              description: Response status
+              example: "success"
+
+    FigmaMcpResponse:
+      type: object
+      description: |
+        Dynamic response structure based on Figma API response for specific nodes.
+        All string values are recursively sanitized for XSS protection.
+        The exact structure depends on the node type and properties.
+      additionalProperties: true
+      example:
+        nodes:
+          "1:2":
+            document:
+              id: "1:2"
+              name: "Button Component"
+              type: "COMPONENT"
+
+    FigmaWebhookEvent:
+      type: object
+      required:
+        - event_type
+      properties:
+        event_type:
+          type: string
+          description: Type of webhook event
+          enum:
+            - FILE_UPDATE
+            - FILE_DELETE
+            - CUSTOM_EVENT
+          example: "FILE_UPDATE"
+        file_key:
+          type: string
+          description: Figma file key (for file-related events)
+          example: "abc123def456"
+        timestamp:
+          type: string
+          format: date-time
+          description: Event timestamp
+          example: "2024-01-15T10:30:00Z"
+      additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - timestamp
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: "Invalid file ID format"
+        code:
+          type: string
+          description: Machine-readable error code
+          enum:
+            - VALIDATION_ERROR
+            - SECURITY_ERROR
+            - METHOD_NOT_ALLOWED
+            - API_ERROR
+            - INTERNAL_ERROR
+            - RATE_LIMIT_EXCEEDED
+          example: "VALIDATION_ERROR"
+        details:
+          description: Additional error details (validation errors, etc.)
+          oneOf:
+            - type: array
+              items:
+                $ref: "#/components/schemas/ValidationError"
+            - type: object
+              additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: Error occurrence timestamp
+          example: "2024-01-15T10:35:00Z"
+        requestId:
+          type: string
+          description: Unique request identifier for tracking
+          example: "figma_1705312500000_abc123"
+
+    ValidationError:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+          description: Field name that failed validation
+          example: "fileId"
+        message:
+          type: string
+          description: Validation error message
+          example: "ファイルIDの形式が無効です"
+        code:
+          type: string
+          description: Validation error code
+          example: "invalid_string"
+
+  securitySchemes:
+    FigmaToken:
+      type: apiKey
+      in: header
+      name: X-Figma-Token
+      description: |
+        Figma API token for server-side authentication.
+        Set via environment variables:
+        - FIGMA_ACCESS_TOKEN (preferred)
+        - FIGMA_PERSONAL_ACCESS_TOKEN (fallback)
+
+    WebhookSignature:
+      type: apiKey
+      in: header
+      name: X-Figma-Signature
+      description: |
+        HMAC-SHA256 signature for webhook verification.
+        Requires FIGMA_WEBHOOK_SECRET environment variable.
+
+  responses:
+    ValidationError:
+      description: Input validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    SecurityError:
+      description: Security validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      headers:
+        X-Rate-Limit-Remaining:
+          description: Number of requests remaining (0)
+          schema:
+            type: integer
+        X-Rate-Limit-Reset:
+          description: Unix timestamp when the rate limit resets
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+tags:
+  - name: Figma API
+    description: |
+      Endpoints for integrating with Figma's API.
+
+      These endpoints provide secure access to Figma files and nodes with:
+      - Server-side authentication using environment variables
+      - Comprehensive input validation and sanitization
+      - XSS protection on all responses
+      - Rate limiting and security monitoring
+
+  - name: MCP
+    description: |
+      Model Context Protocol endpoints for structured data access.
+
+      MCP endpoints provide specialized access to Figma data structures
+      with enhanced validation and processing capabilities.
+
+  - name: Webhooks
+    description: |
+      Webhook endpoints for receiving real-time updates from external services.
+
+      All webhook endpoints implement signature verification and
+      comprehensive event logging for security and monitoring.
+
+externalDocs:
+  description: Find more information in the API documentation
+  url: /docs/api/README.md
