@@ -51,7 +51,11 @@
     "env:validate": "node scripts/validate-env.js",
     "docs:generate": "tsx scripts/generate-docs.ts --verbose",
     "docs:generate:quiet": "tsx scripts/generate-docs.ts",
-    "docs:clean": "rm -rf docs/generated/*"
+    "docs:clean": "rm -rf docs/generated/*",
+    "docs:validate": "tsx scripts/validate-docs.ts",
+    "docs:validate:ci": "tsx scripts/validate-docs.ts --strict",
+    "docs:check": "npm run docs:validate && echo 'All documentation is valid!'",
+    "docs:full": "npm run docs:generate && npm run docs:validate"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -96,9 +100,11 @@
     "autoprefixer": "^10.4.21",
     "eslint": "8.57.1",
     "eslint-config-next": "^15.3.5",
+    "glob": "^10.3.10",
     "playwright": "^1.54.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.1.6"
   }
 }
