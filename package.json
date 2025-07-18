@@ -55,7 +55,10 @@
     "docs:validate": "tsx scripts/validate-docs.ts",
     "docs:validate:ci": "tsx scripts/validate-docs.ts --strict",
     "docs:check": "npm run docs:validate && echo 'All documentation is valid!'",
-    "docs:full": "npm run docs:generate && npm run docs:validate"
+    "docs:full": "npm run docs:generate && npm run docs:validate",
+    "docs:completeness": "tsx scripts/validate-documentation-completeness.ts",
+    "docs:validate:all": "npm run docs:validate && npm run docs:completeness",
+    "docs:index": "echo 'Validating documentation index and navigation structure...' && npm run docs:validate:all"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
